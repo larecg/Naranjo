@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en" id="html-root">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title data-i18n="title">Privacy Policy — Naranjo</title>
+  <link rel="icon" href="icon.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --color-amber:  #F4991A;
+      --color-moss:   #344F1F;
+      --color-sand:   #F2EAD3;
+      --color-cream:  #F9F5F0;
+      --color-white:  #FFFFFF;
+      --color-chrome: #A0522D;
+      --text-primary: #344F1F;
+      --text-muted:   #6b7280;
+      --border:       #F2EAD3;
+      --shadow-panel: 0 4px 20px rgba(52, 79, 31, 0.06);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-amber:  #F4991A;
+        --color-moss:   #D4C9B8;
+        --color-sand:   #3D3530;
+        --color-cream:  #1C1A17;
+        --color-white:  #2A2520;
+        --color-chrome: #A0522D;
+        --text-primary: #E8E0D0;
+        --text-muted:   #9ca3af;
+        --border:       #3D3530;
+        --shadow-panel: 0 4px 20px rgba(0, 0, 0, 0.3);
+      }
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--color-cream);
+      color: var(--text-primary);
+      line-height: 1.7;
+      font-size: 14px;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    /* ── Header ─────────────────────────────────────────── */
+    header {
+      background: var(--color-chrome);
+      color: #ffffff;
+      padding: 2.5rem 1.5rem 2rem;
+      text-align: center;
+    }
+
+    .header-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    .header-logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+    }
+
+    header h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--color-amber);
+    }
+
+    header p {
+      font-size: 0.875rem;
+      color: rgba(255, 255, 255, 0.8);
+      margin-top: 0.1rem;
+    }
+
+    /* ── Main content ────────────────────────────────────── */
+    .container {
+      max-width: 780px;
+      margin: 2.5rem auto;
+      padding: 0 1.5rem 4rem;
+    }
+
+    .callout {
+      background: var(--color-white);
+      border-left: 4px solid var(--color-amber);
+      border-radius: 0 12px 12px 0;
+      box-shadow: var(--shadow-panel);
+      padding: 1rem 1.25rem;
+      margin-bottom: 2.5rem;
+      font-size: 0.9rem;
+    }
+
+    .callout strong { color: var(--color-amber); }
+
+    h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-amber);
+      margin: 2.5rem 0 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 3px solid var(--color-amber);
+      display: inline-block;
+    }
+
+    /* Force h2 to full width but underline only the text */
+    .section-heading {
+      margin: 2.5rem 0 0.75rem;
+    }
+
+    h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 1.4rem 0 0.4rem;
+    }
+
+    p { margin-bottom: 0.9rem; font-size: 0.9rem; }
+
+    ul {
+      list-style: disc;
+      padding-left: 1.5rem;
+      margin-bottom: 0.9rem;
+    }
+
+    ul li { margin-bottom: 0.3rem; font-size: 0.9rem; }
+
+    /* ── Tables ──────────────────────────────────────────── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+      margin: 1rem 0 1.5rem;
+      background: var(--color-white);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: var(--shadow-panel);
+    }
+
+    th {
+      background: var(--color-sand);
+      color: var(--text-primary);
+      font-weight: 600;
+      text-align: left;
+      padding: 0.65rem 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 0.6rem 1rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    td a {
+      color: var(--color-amber);
+      text-decoration: none;
+      word-break: break-all;
+    }
+
+    td a:hover { text-decoration: underline; }
+
+    code {
+      font-family: "SFMono-Regular", Consolas, monospace;
+      background: var(--color-sand);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.1em 0.4em;
+      font-size: 0.82em;
+    }
+
+    /* ── Footer ──────────────────────────────────────────── */
+    footer {
+      background: var(--color-chrome);
+      color: rgba(255, 255, 255, 0.7);
+      text-align: center;
+      font-size: 0.8rem;
+      padding: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    footer a {
+      color: var(--color-amber);
+      text-decoration: none;
+    }
+
+    footer a:hover { text-decoration: underline; }
+
+    footer .footer-inner {
+      max-width: 780px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    /* ── Responsive ──────────────────────────────────────── */
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.4rem; }
+      footer .footer-inner { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <img src="icon.png" alt="Naranjo icon" class="header-logo" />
+    <h1>Naranjo</h1>
+    <p data-i18n="headerSub">Privacy Policy &mdash; Last updated: April 2, 2026</p>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="callout" data-i18n="callout">
+    <strong>The short version:</strong> Naranjo does not collect, transmit, or share your data with the extension developers. All configuration is stored locally on your device.
+  </div>
+
+  <div class="section-heading"><h2 data-i18n="s1h">Overview</h2></div>
+  <p data-i18n="s1p">Naranjo ("the Extension") is a browser extension that processes selected text using AI language models. This policy explains what data the Extension accesses, how it is used, and what is stored.</p>
+
+  <div class="section-heading"><h2 data-i18n="s2h">Data the Extension Accesses</h2></div>
+
+  <h3 data-i18n="s2h1">Text you select</h3>
+  <p data-i18n="s2p1">When you invoke a Naranjo action, the text you have selected on a webpage is sent directly to the AI provider you have configured. This text is <strong>never sent to Naranjo's developers</strong> &mdash; it goes only to the provider endpoint you specify in settings. For Ollama specifically, the destination depends on your configuration: if no cloud API key is set, requests are sent to your <strong>local Ollama server</strong> (<code>http://localhost:11434</code>) and no data leaves your machine; if you configure an Ollama cloud API key in settings, requests are routed to <strong>ollama.com's API</strong> instead.</p>
+
+  <h3 data-i18n="s2h2">API keys</h3>
+  <p data-i18n="s2p2">If you configure a cloud AI provider, you supply your own API key. These keys are stored exclusively in <strong>Chrome's local extension storage</strong> (<code>chrome.storage.local</code>) on your own device. They are never transmitted to Naranjo's servers (which do not exist) or any third party other than the respective provider's API endpoint.</p>
+
+  <h3 data-i18n="s2h3">Browsing activity</h3>
+  <p data-i18n="s2p3">The Extension injects a content script on all pages to enable the quick-menu overlay and keyboard shortcuts. It reads the current page's selected text only when you explicitly trigger an action. It does not read page content passively, track URLs, or monitor your browsing history.</p>
+
+  <h3 data-i18n="s2h4">Usage history</h3>
+  <p data-i18n="s2p4">A log of recent actions (context name, input text snippet, status) is stored locally in <code>chrome.storage.local</code> to populate the Activity tab in the popup. This data never leaves your device.</p>
+
+  <div class="section-heading"><h2 data-i18n="s3h">Data the Extension Does NOT Collect</h2></div>
+  <ul data-i18n="s3ul">
+    <li>No analytics or telemetry</li>
+    <li>No crash reports sent to third parties</li>
+    <li>No personally identifiable information (PII)</li>
+    <li>No cookies or tracking pixels</li>
+    <li>No data transmitted to Naranjo's developers</li>
+    <li><strong>Your data is never sold</strong> to third parties, data brokers, or advertisers</li>
+    <li>Your data is never used for personalized advertising</li>
+  </ul>
+
+  <div class="section-heading"><h2 data-i18n="s4h">Third-Party AI Providers</h2></div>
+  <p data-i18n="s4p1">Naranjo routes your requests to the AI provider(s) you configure. Each provider has its own privacy policy and data handling practices:</p>
+
+  <table>
+    <thead>
+      <tr><th data-i18n="tProvider">Provider</th><th data-i18n="tPrivacyPolicy">Privacy Policy</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Ollama</td><td data-i18n="ollamaDesc"><strong>Local mode (default):</strong> runs entirely on your machine &mdash; no external data transfer. <strong>Cloud mode:</strong> if you configure an Ollama cloud API key in settings, requests are sent to <a href="https://ollama.com/privacy" target="_blank" rel="noopener">ollama.com</a> and are subject to their privacy policy.</td></tr>
+      <tr><td>OpenAI</td><td><a href="https://openai.com/policies/privacy-policy" target="_blank" rel="noopener">openai.com/policies/privacy-policy</a></td></tr>
+      <tr><td>Anthropic</td><td><a href="https://www.anthropic.com/privacy" target="_blank" rel="noopener">anthropic.com/privacy</a></td></tr>
+      <tr><td>Google Gemini</td><td><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a></td></tr>
+      <tr><td>Mistral AI</td><td><a href="https://mistral.ai/terms/#privacy-policy" target="_blank" rel="noopener">mistral.ai/terms/#privacy-policy</a></td></tr>
+      <tr><td>xAI (Grok)</td><td><a href="https://x.ai/privacy-policy" target="_blank" rel="noopener">x.ai/privacy-policy</a></td></tr>
+      <tr><td>DeepSeek</td><td><a href="https://www.deepseek.com/en/privacy_policy" target="_blank" rel="noopener">deepseek.com/en/privacy_policy</a></td></tr>
+      <tr><td>Chrome Built-in AI (Gemini Nano)</td><td data-i18n="chromeAiDesc">Processed locally by Chrome &mdash; subject to Google's Chrome privacy policy</td></tr>
+    </tbody>
+  </table>
+
+  <p data-i18n="s4p2">By configuring a cloud provider, you actively consent to your selected text being sent to that provider's API endpoint over an encrypted HTTPS connection. You agree to that provider's terms and privacy policy. Naranjo's developers have no access to this data.</p>
+
+  <div class="section-heading"><h2 data-i18n="s5h">Permissions Justification</h2></div>
+  <p data-i18n="s5p">The Extension requests the following Chrome permissions:</p>
+
+  <table>
+    <thead>
+      <tr><th data-i18n="tPermission">Permission</th><th data-i18n="tReason">Reason</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>storage</code></td><td data-i18n="pStorage">Save your provider configurations, custom contexts, and activity log locally</td></tr>
+      <tr><td><code>contextMenus</code></td><td data-i18n="pContextMenus">Add Naranjo actions to the right-click context menu</td></tr>
+      <tr><td><code>activeTab</code> / <code>tabs</code></td><td data-i18n="pTabs">Read selected text and inject response overlays into the active tab</td></tr>
+      <tr><td><code>scripting</code></td><td data-i18n="pScripting">Inject the content script for the quick-menu overlay</td></tr>
+      <tr><td><code>http://localhost:11434/*</code></td><td data-i18n="pLocalhost">Allow requests to a locally running Ollama instance on its default port. No data leaves your machine.</td></tr>
+      <tr><td><code>https://ollama.com/*</code></td><td data-i18n="pOllama">Used in Ollama cloud mode: fetch the list of available models and send prompts to the Ollama cloud API when a cloud API key is configured. Not contacted in local mode.</td></tr>
+      <tr><td><code>https://api.openai.com/*</code></td><td data-i18n="pOpenAI">Send requests to OpenAI when you have that provider enabled.</td></tr>
+      <tr><td><code>https://api.anthropic.com/*</code></td><td data-i18n="pAnthropic">Send requests to Anthropic when you have that provider enabled.</td></tr>
+      <tr><td><code>https://generativelanguage.googleapis.com/*</code></td><td data-i18n="pGemini">Send requests to Google Gemini when you have that provider enabled.</td></tr>
+      <tr><td><code>https://api.mistral.ai/*</code></td><td data-i18n="pMistral">Send requests to Mistral AI when you have that provider enabled.</td></tr>
+      <tr><td><code>https://api.x.ai/*</code></td><td data-i18n="pXAI">Send requests to xAI (Grok) when you have that provider enabled.</td></tr>
+      <tr><td><code>https://api.deepseek.com/*</code></td><td data-i18n="pDeepSeek">Send requests to DeepSeek when you have that provider enabled.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-heading"><h2 data-i18n="s6h">Data Retention and Deletion</h2></div>
+  <p data-i18n="s6p">All data (provider configs, API keys, custom prompts, activity log) is stored in Chrome's local extension storage. You can delete it at any time by:</p>
+  <ul data-i18n="s6ul">
+    <li>Clearing activity history via the <strong>Clear All</strong> button in the Activity tab</li>
+    <li>Resetting provider settings in the Options page</li>
+    <li>Uninstalling the Extension (Chrome will purge its local storage automatically)</li>
+  </ul>
+
+  <div class="section-heading"><h2 data-i18n="s7h">Data Security</h2></div>
+  <p data-i18n="s7p1">All requests from Naranjo to cloud AI providers are transmitted over encrypted HTTPS/TLS connections. API keys and configuration data stored in <code>chrome.storage.local</code> are protected by Chrome's built-in storage isolation — they are inaccessible to other extensions or websites.</p>
+  <p data-i18n="s7p2">Naranjo's developers and maintainers have no ability to access, view, or retrieve any data stored on your device or sent to your configured AI providers.</p>
+
+  <div class="section-heading"><h2 data-i18n="s8h">Limited Use Compliance</h2></div>
+  <p data-i18n="s8p">Naranjo's use of data complies with the <a href="https://developer.chrome.com/docs/webstore/program-policies/limited-use" target="_blank" rel="noopener" style="color: var(--color-amber);">Chrome Web Store Limited Use Policy</a>. Specifically:</p>
+  <ul data-i18n="s8ul">
+    <li>Data is used solely to fulfill the Extension's single purpose: processing your selected text with the AI provider you configure</li>
+    <li>Data is never transferred to third parties except to the AI provider endpoint you explicitly choose</li>
+    <li>Data is never used for advertising, profiling, or any purpose unrelated to the Extension's core function</li>
+    <li>Developers cannot read user data</li>
+  </ul>
+
+  <div class="section-heading"><h2 data-i18n="s9h">Your Rights (GDPR &amp; CCPA)</h2></div>
+  <p data-i18n="s9p1">Because Naranjo stores all data locally on your device and does not transmit it to the extension's developers, we do not hold any personal data about you. However, you retain the following rights:</p>
+  <ul data-i18n="s9ul">
+    <li><strong>Right to access:</strong> All data the Extension holds is visible to you directly in the Extension's settings and Activity tab</li>
+    <li><strong>Right to deletion:</strong> You can delete all data at any time via the Activity tab, Options page, or by uninstalling the Extension</li>
+    <li><strong>Right to opt out of data sale:</strong> Naranjo does not sell your data — there is nothing to opt out of</li>
+    <li><strong>California residents (CCPA):</strong> We do not sell personal information. No data sharing for cross-context behavioral advertising occurs</li>
+    <li><strong>EU/EEA residents (GDPR):</strong> No personal data is processed by or on behalf of Naranjo's developers. Any processing by third-party AI providers is governed by their own privacy policies and legal bases</li>
+  </ul>
+  <p data-i18n="s9p2">To exercise any rights related to data held by a third-party AI provider, please refer to that provider's privacy policy directly.</p>
+
+  <div class="section-heading"><h2 data-i18n="s10h">Children's Privacy</h2></div>
+  <p data-i18n="s10p">The Extension is not directed at children under 13 (or under 16 in the EU/EEA). We do not knowingly process data from children. If you believe a child has used this Extension to send data to a third-party AI provider, please contact that provider directly to request deletion.</p>
+
+  <div class="section-heading"><h2 data-i18n="s11h">Changes to This Policy</h2></div>
+  <p data-i18n="s11p">If this policy changes materially, the updated date at the top of this document will be revised. Continued use of the Extension after changes constitutes acceptance of the new policy.</p>
+
+  <div class="section-heading"><h2 data-i18n="s12h">Contact</h2></div>
+  <p data-i18n="s12p">For questions or concerns about this privacy policy, please open an issue on the project's <a href="https://github.com/larecg/Naranjo" style="color: var(--color-amber);">GitHub repository</a>.</p>
+
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <span>&copy; <span id="year"></span> Naranjo. <span data-i18n="rights">All rights reserved.</span></span>
+    <span>
+      <a href="https://github.com/larecg/Naranjo" target="_blank" rel="noopener" data-i18n="githubRepo">GitHub Repository</a>
+      &nbsp;&middot;&nbsp;
+      <span data-i18n="licensedUnder">Licensed under</span> <a href="https://www.gnu.org/licenses/gpl-3.0.en.html" target="_blank" rel="noopener">GPL v3.0</a>
+    </span>
+  </div>
+</footer>
+
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  const translations = {
+    es: {
+      title:       'Política de Privacidad — Naranjo',
+      headerSub:   'Política de Privacidad \u2014 Última actualización: 2 de abril de 2026',
+      callout:     '<strong>La versión corta:</strong> Naranjo no recopila, transmite ni comparte tus datos con los desarrolladores de la extensión. Toda la configuración se almacena localmente en tu dispositivo.',
+      s1h:  'Descripción general',
+      s1p:  'Naranjo ("la Extensión") es una extensión de navegador que procesa texto seleccionado mediante modelos de lenguaje de IA. Esta política explica a qué datos accede la Extensión, cómo se utilizan y qué se almacena.',
+      s2h:  'Datos a los que accede la Extensión',
+      s2h1: 'Texto que seleccionas',
+      s2p1: 'Cuando ejecutas una acción de Naranjo, el texto que hayas seleccionado en una página web se envía directamente al proveedor de IA que hayas configurado. Este texto <strong>nunca se envía a los desarrolladores de Naranjo</strong> \u2014 solo va al endpoint del proveedor que especifiques en la configuración. En el caso de Ollama, el destino depende de tu configuración: si no se ha establecido ninguna clave de API en la nube, las solicitudes se envían a tu <strong>servidor local de Ollama</strong> (<code>http://localhost:11434</code>) y ningún dato abandona tu máquina; si configuras una clave de API en la nube de Ollama en los ajustes, las solicitudes se enrutan a la <strong>API de ollama.com</strong>.',
+      s2h2: 'Claves de API',
+      s2p2: 'Si configuras un proveedor de IA en la nube, proporcionas tu propia clave de API. Estas claves se almacenan exclusivamente en el <strong>almacenamiento local de la extensión de Chrome</strong> (<code>chrome.storage.local</code>) en tu dispositivo. Nunca se transmiten a los servidores de Naranjo (que no existen) ni a terceros, salvo al endpoint de API del proveedor correspondiente.',
+      s2h3: 'Actividad de navegación',
+      s2p3: 'La Extensión inyecta un script de contenido en todas las páginas para habilitar el menú rápido superpuesto y los atajos de teclado. Solo lee el texto seleccionado de la página cuando tú activas explícitamente una acción. No lee el contenido de la página de forma pasiva, no rastrea URLs ni monitoriza tu historial de navegación.',
+      s2h4: 'Historial de uso',
+      s2p4: 'Un registro de las acciones recientes (nombre del contexto, fragmento del texto de entrada, estado) se almacena localmente en <code>chrome.storage.local</code> para mostrar la pestaña de Actividad en el panel. Estos datos nunca abandonan tu dispositivo.',
+      s3h:  'Datos que la Extensión NO recopila',
+      s3ul: '<li>Sin análisis ni telemetría</li><li>Sin informes de errores enviados a terceros</li><li>Sin información de identificación personal (PII)</li><li>Sin cookies ni píxeles de seguimiento</li><li>Sin datos transmitidos a los desarrolladores de Naranjo</li><li><strong>Tus datos nunca se venden</strong> a terceros, intermediarios de datos o anunciantes</li><li>Tus datos nunca se utilizan para publicidad personalizada</li>',
+      s4h:  'Proveedores de IA de terceros',
+      s4p1: 'Naranjo enruta tus solicitudes al proveedor de IA que configures. Cada proveedor tiene su propia política de privacidad y prácticas de manejo de datos:',
+      tProvider:    'Proveedor',
+      tPrivacyPolicy: 'Política de privacidad',
+      ollamaDesc:   '<strong>Modo local (predeterminado):</strong> se ejecuta completamente en tu máquina \u2014 sin transferencia de datos externos. <strong>Modo nube:</strong> si configuras una clave de API en la nube de Ollama en los ajustes, las solicitudes se envían a <a href="https://ollama.com/privacy" target="_blank" rel="noopener">ollama.com</a> y están sujetas a su política de privacidad.',
+      chromeAiDesc: 'Procesado localmente por Chrome \u2014 sujeto a la política de privacidad de Chrome de Google',
+      s4p2: 'Al configurar un proveedor en la nube, consientes activamente que tu texto seleccionado sea enviado al endpoint de API de ese proveedor a través de una conexión HTTPS cifrada. Aceptas los términos y la política de privacidad de dicho proveedor. Los desarrolladores de Naranjo no tienen acceso a estos datos.',
+      s5h:  'Justificación de permisos',
+      s5p:  'La Extensión solicita los siguientes permisos de Chrome:',
+      tPermission:  'Permiso',
+      tReason:      'Motivo',
+      pStorage:     'Guardar localmente las configuraciones de proveedores, contextos personalizados y el registro de actividad',
+      pContextMenus:'Agregar acciones de Naranjo al menú contextual del botón derecho',
+      pTabs:        'Leer el texto seleccionado e inyectar respuestas superpuestas en la pestaña activa',
+      pScripting:   'Inyectar el script de contenido para el menú rápido superpuesto',
+      pLocalhost:   'Permitir solicitudes a una instancia local de Ollama en su puerto predeterminado. Ningún dato abandona tu máquina.',
+      pOllama:           'Usado en modo nube de Ollama: obtener la lista de modelos disponibles y enviar solicitudes a la API en la nube de Ollama cuando se configura una clave de API. No se contacta en modo local.',
+      pOpenAI:           'Enviar solicitudes a OpenAI cuando ese proveedor está habilitado.',
+      pAnthropic:        'Enviar solicitudes a Anthropic cuando ese proveedor está habilitado.',
+      pGemini:           'Enviar solicitudes a Google Gemini cuando ese proveedor está habilitado.',
+      pMistral:          'Enviar solicitudes a Mistral AI cuando ese proveedor está habilitado.',
+      pXAI:              'Enviar solicitudes a xAI (Grok) cuando ese proveedor está habilitado.',
+      pDeepSeek:         'Enviar solicitudes a DeepSeek cuando ese proveedor está habilitado.',
+      s6h:  'Retención y eliminación de datos',
+      s6p:  'Todos los datos (configuraciones de proveedores, claves de API, prompts personalizados, registro de actividad) se almacenan en el almacenamiento local de la extensión de Chrome. Puedes eliminarlos en cualquier momento:',
+      s6ul: '<li>Borrando el historial de actividad mediante el botón <strong>Borrar todo</strong> en la pestaña de Actividad</li><li>Restableciendo la configuración del proveedor en la página de Opciones</li><li>Desinstalando la Extensión (Chrome eliminará automáticamente su almacenamiento local)</li>',
+      s7h:  'Seguridad de datos',
+      s7p1: 'Todas las solicitudes de Naranjo a proveedores de IA en la nube se transmiten a través de conexiones HTTPS/TLS cifradas. Las claves de API y los datos de configuración almacenados en <code>chrome.storage.local</code> están protegidos por el aislamiento de almacenamiento integrado de Chrome, siendo inaccesibles para otras extensiones o sitios web.',
+      s7p2: 'Los desarrolladores y mantenedores de Naranjo no tienen ninguna capacidad para acceder, ver o recuperar datos almacenados en tu dispositivo o enviados a tus proveedores de IA configurados.',
+      s8h:  'Cumplimiento de uso limitado',
+      s8p:  'El uso de datos por parte de Naranjo cumple con la <a href="https://developer.chrome.com/docs/webstore/program-policies/limited-use" target="_blank" rel="noopener" style="color: var(--color-amber);">Política de uso limitado de Chrome Web Store</a>. Específicamente:',
+      s8ul: '<li>Los datos se utilizan únicamente para cumplir con el propósito único de la Extensión: procesar el texto seleccionado con el proveedor de IA que configures</li><li>Los datos nunca se transfieren a terceros, salvo al endpoint del proveedor de IA que elijas explícitamente</li><li>Los datos nunca se utilizan para publicidad, perfilado ni ningún otro propósito ajeno a la función principal de la Extensión</li><li>Los desarrolladores no pueden leer los datos del usuario</li>',
+      s9h:  'Tus derechos (RGPD y CCPA)',
+      s9p1: 'Dado que Naranjo almacena todos los datos localmente en tu dispositivo y no los transmite a los desarrolladores de la extensión, no conservamos ningún dato personal sobre ti. No obstante, conservas los siguientes derechos:',
+      s9ul: '<li><strong>Derecho de acceso:</strong> Todos los datos que la Extensión conserva son visibles directamente en la configuración y en la pestaña de Actividad de la Extensión</li><li><strong>Derecho de supresión:</strong> Puedes eliminar todos los datos en cualquier momento desde la pestaña de Actividad, la página de Opciones o desinstalando la Extensión</li><li><strong>Derecho a oponerse a la venta de datos:</strong> Naranjo no vende tus datos \u2014 no hay nada a lo que oponerse</li><li><strong>Residentes de California (CCPA):</strong> No vendemos información personal. No se comparten datos para publicidad conductual entre contextos</li><li><strong>Residentes de la UE/EEE (RGPD):</strong> Los desarrolladores de Naranjo no procesan datos personales. Cualquier tratamiento por parte de proveedores de IA de terceros se rige por sus propias políticas de privacidad y bases legales</li>',
+      s9p2: 'Para ejercer cualquier derecho relacionado con datos en poder de un proveedor de IA de terceros, consulta directamente la política de privacidad de dicho proveedor.',
+      s10h: 'Privacidad de menores',
+      s10p: 'La Extensión no está dirigida a menores de 13 años (ni de 16 en la UE/EEE). No procesamos datos de menores de forma consciente. Si crees que un menor ha utilizado esta Extensión para enviar datos a un proveedor de IA de terceros, contacta directamente con ese proveedor para solicitar la eliminación.',
+      s11h: 'Cambios en esta política',
+      s11p: 'Si esta política cambia de forma sustancial, la fecha de actualización en la parte superior del documento será revisada. El uso continuado de la Extensión tras los cambios implica la aceptación de la nueva política.',
+      s12h: 'Contacto',
+      s12p: 'Para preguntas o dudas sobre esta política de privacidad, abre un issue en el <a href="https://github.com/larecg/Naranjo" style="color: var(--color-amber);">repositorio de GitHub</a> del proyecto.',
+      rights:       'Todos los derechos reservados.',
+      githubRepo:   'Repositorio de GitHub',
+      licensedUnder:'Licenciado bajo',
+    }
+  };
+
+  const lang = navigator.language.startsWith('es') ? 'es' : null;
+  if (lang) {
+    document.getElementById('html-root').lang = lang;
+    const t = translations[lang];
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (t[key] !== undefined) el.innerHTML = t[key];
+    });
+    document.title = t.title;
+  }
+</script>
+</body>
+</html>

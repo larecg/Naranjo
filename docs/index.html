@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" id="html-root">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title data-i18n="title">Naranjo — AI text processing in your browser</title>
+  <link rel="icon" href="icon.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --color-amber:  #F4991A;
+      --color-moss:   #344F1F;
+      --color-sand:   #F2EAD3;
+      --color-cream:  #F9F5F0;
+      --color-white:  #FFFFFF;
+      --color-chrome: #A0522D;
+      --text-primary: #344F1F;
+      --text-muted:   #6b7280;
+      --border:       #F2EAD3;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-amber:  #F4991A;
+        --color-moss:   #D4C9B8;
+        --color-sand:   #3D3530;
+        --color-cream:  #1C1A17;
+        --color-white:  #2A2520;
+        --color-chrome: #A0522D;
+        --text-primary: #E8E0D0;
+        --text-muted:   #9ca3af;
+        --border:       #3D3530;
+      }
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--color-cream);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      text-align: center;
+    }
+
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 0;
+    }
+
+    .logo {
+      width: 72px;
+      height: 72px;
+      border-radius: 18px;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--color-amber);
+      margin-bottom: 0.5rem;
+    }
+
+    .tagline {
+      font-size: 1rem;
+      color: var(--text-muted);
+      margin-bottom: 2.5rem;
+      max-width: 420px;
+    }
+
+    .badge {
+      display: inline-block;
+      background: var(--color-sand);
+      color: var(--text-primary);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.4rem 1rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      margin-bottom: 3rem;
+    }
+
+    footer {
+      width: 100%;
+      background: var(--color-chrome);
+      color: rgba(255, 255, 255, 0.7);
+      text-align: center;
+      font-size: 0.8rem;
+      padding: 1.5rem;
+    }
+
+    footer a {
+      color: var(--color-amber);
+      text-decoration: none;
+    }
+
+    footer a:hover { text-decoration: underline; }
+
+    footer .footer-inner {
+      max-width: 780px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    @media (max-width: 600px) {
+      footer .footer-inner {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="main-content">
+    <img src="icon.png" alt="Naranjo icon" class="logo" />
+    <h1>Naranjo</h1>
+    <p class="tagline" data-i18n="tagline">AI text processing directly in your browser.</p>
+    <span class="badge" data-i18n="badge">Coming soon</span>
+
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <span>&copy; <span id="year"></span> Naranjo. <span data-i18n="rights">All rights reserved.</span></span>
+      <a href="privacy-policy.html" data-i18n="privacyPolicy">Privacy Policy</a>
+      <span><span data-i18n="licensedUnder">Licensed under</span> <a href="https://www.gnu.org/licenses/gpl-3.0.en.html" target="_blank" rel="noopener">GPL v3.0</a></span>
+    </div>
+  </footer>
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const translations = {
+      es: {
+        title:        'Naranjo — Procesamiento de texto con IA en tu navegador',
+        tagline:      'Procesamiento de texto con IA directamente en tu navegador.',
+        badge:        'Próximamente',
+        rights:       'Todos los derechos reservados.',
+        privacyPolicy:'Política de privacidad',
+        licensedUnder:'Licenciado bajo',
+      }
+    };
+
+    const lang = navigator.language.startsWith('es') ? 'es' : null;
+    if (lang) {
+      document.getElementById('html-root').lang = lang;
+      const t = translations[lang];
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (t[key]) el.textContent = t[key];
+      });
+      document.title = t.title;
+    }
+  </script>
+
+</body>
+</html>
