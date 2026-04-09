@@ -1,0 +1,384 @@
+{
+  "extName": {
+    "message": "Naranjo"
+  },
+  "extDescription": {
+    "message": "Procesamiento de texto con IA multi-proveedor directamente en tu navegador"
+  },
+  "action_title": {
+    "message": "Haz clic para abrir Naranjo"
+  },
+  "tab_activity": {
+    "message": "Actividad"
+  },
+  "tab_settings": {
+    "message": "Ajustes"
+  },
+  "tab_help": {
+    "message": "Ayuda"
+  },
+  "activity_header": {
+    "message": "Actividad reciente"
+  },
+  "btn_clear_all": {
+    "message": "Borrar todo"
+  },
+  "activity_empty": {
+    "message": "¡Todo al día! No hay actividad reciente."
+  },
+  "col_date": {
+    "message": "Fecha"
+  },
+  "col_context": {
+    "message": "Contexto"
+  },
+  "col_input": {
+    "message": "Entrada"
+  },
+  "col_status": {
+    "message": "Estado"
+  },
+  "col_actions": {
+    "message": "Acciones"
+  },
+  "label_select_model": {
+    "message": "Seleccionar modelo"
+  },
+  "col_title": {
+    "message": "Título"
+  },
+  "col_prompt": {
+    "message": "Instrucción"
+  },
+  "col_action": {
+    "message": "Acción"
+  },
+  "help_getting_started": {
+    "message": "Primeros pasos"
+  },
+  "help_step1_title": {
+    "message": "Configura un proveedor"
+  },
+  "help_step1_desc": {
+    "message": "Configura tu proveedor de IA preferido (Ollama, OpenAI, Gemini y más) en Ajustes."
+  },
+  "help_step2_title": {
+    "message": "Seleccionar modelo"
+  },
+  "help_step2_desc": {
+    "message": "Elige tu LLM preferido en Ajustes."
+  },
+  "help_step3_title": {
+    "message": "¡Listo!"
+  },
+  "help_step3_desc": {
+    "message": "Selecciona texto y pulsa el atajo."
+  },
+  "help_faq_title": {
+    "message": "Preguntas frecuentes"
+  },
+  "help_faq1_title": {
+    "message": "¿Cómo se usa?"
+  },
+  "help_faq1_desc": {
+    "message": "Selecciona cualquier texto en una página web para abrir el menú rápido y elegir una acción. También puedes escribir un prompt personalizado directamente desde el menú rápido."
+  },
+  "help_faq2_title": {
+    "message": "¿Cuál es el atajo?"
+  },
+  "help_faq2_desc": {
+    "message": "Por defecto, pulsa <code>Opt+Shift+Q</code> (Mac) o <code>Alt+Shift+Q</code> (Win) para abrir el menú de selección. Puedes personalizarlos en los ajustes de Chrome."
+  },
+  "help_faq3_title": {
+    "message": "¿Puedo cambiar los atajos predefinidos? ¿Cómo?"
+  },
+  "help_faq3_text": {
+    "message": "¡Sí! Si los atajos entran en conflicto con otros plugins o prefieres otros, puedes cambiarlos en los ajustes de Chrome:"
+  },
+  "help_faq4_title": {
+    "message": "¿Puedo hacerlo más rápido?"
+  },
+  "help_faq4_desc": {
+    "message": "Usa el atajo <code>Opt+Shift+R</code> (predeterminado) para ejecutar tu contexto predeterminado directamente sobre el texto seleccionado sin abrir el menú."
+  },
+  "help_faq5_title": {
+    "message": "¿Cómo personalizo las instrucciones?"
+  },
+  "help_faq5_desc": {
+    "message": "Ve a la pestaña Ajustes para agregar, editar o eliminar tus propios contextos e instrucciones."
+  },
+  "help_faq6_title": {
+    "message": "¿Por qué no funciona?"
+  },
+  "help_faq6_desc": {
+    "message": "Asegúrate de que tu proveedor de IA esté configurado y habilitado en Ajustes y de que hayas seleccionado un modelo. Si usas Ollama, verifica que el servidor esté en ejecución localmente."
+  },
+  "community_title": {
+    "message": "Comunidad y recursos"
+  },
+  "community_text": {
+    "message": "¿Quieres contribuir o reportar un problema? Únete a nosotros en GitHub."
+  },
+  "btn_view_repo": {
+    "message": "Ver repositorio"
+  },
+  "btn_report_bug": {
+    "message": "Reportar error en GitHub"
+  },
+  "error_unknown": {
+    "message": "Error desconocido"
+  },
+  "menu_header": {
+    "message": "Acciones de Naranjo"
+  },
+  "msg_select_text": {
+    "message": "Primero selecciona algún texto"
+  },
+  "menu_footer": {
+    "message": "↵ Ejecutar  |  ⌥↵ Predeterminar  |  ⎋ Cerrar"
+  },
+  "badge_default": {
+    "message": "Pred."
+  },
+  "set_as_default": {
+    "message": "\"$CONTEXT_NAME$\" establecido como predeterminado",
+    "placeholders": {
+      "context_name": {
+        "content": "$1"
+      }
+    }
+  },
+  "toast_header": {
+    "message": "Extensión Naranjo"
+  },
+  "ctx_translate_title": {
+    "message": "Traducir"
+  },
+  "ctx_translate_prompt": {
+    "message": "Traduce el siguiente texto al español, evita explicaciones"
+  },
+  "ctx_fix_grammar_title": {
+    "message": "Corregir gramática"
+  },
+  "ctx_fix_grammar_prompt": {
+    "message": "Elimina errores tipográficos y mejora la gramática del siguiente texto, evita explicaciones"
+  },
+  "ctx_explain_it_title": {
+    "message": "Explicar"
+  },
+  "ctx_explain_it_prompt": {
+    "message": "Por favor explica paso a paso el siguiente texto"
+  },
+  "ctx_rephrase_it_title": {
+    "message": "Reformular"
+  },
+  "ctx_rephrase_it_prompt": {
+    "message": "Por favor reformula el siguiente texto, evita explicaciones"
+  },
+  "ctx_synonymous_title": {
+    "message": "Sinónimo"
+  },
+  "ctx_synonymous_prompt": {
+    "message": "Por favor dame un sinónimo del siguiente texto, evita explicaciones"
+  },
+  "ctx_antonym_title": {
+    "message": "Antónimo"
+  },
+  "ctx_antonym_prompt": {
+    "message": "Por favor dame un antónimo del siguiente texto, evita explicaciones"
+  },
+  "action_replace": {
+    "message": "reemplazar"
+  },
+  "action_alert": {
+    "message": "alertar"
+  },
+  "msg_context_restored": {
+    "message": "Contexto restaurado al último estado guardado"
+  },
+  "msg_context_restore_error": {
+    "message": "Error al restaurar el contexto"
+  },
+  "msg_context_deleted": {
+    "message": "Contexto eliminado correctamente"
+  },
+  "msg_context_delete_error": {
+    "message": "Error al eliminar el contexto"
+  },
+  "msg_changes_saved": {
+    "message": "Todos los cambios guardados correctamente"
+  },
+  "msg_changes_save_error": {
+    "message": "Error al guardar algunos cambios"
+  },
+  "msg_fill_all_fields": {
+    "message": "Por favor completa todos los campos"
+  },
+  "msg_context_added": {
+    "message": "Nuevo contexto añadido correctamente"
+  },
+  "msg_context_add_error": {
+    "message": "Error al añadir el nuevo contexto"
+  },
+  "processing_request": {
+    "message": "Procesando solicitud: $CONTEXT_TITLE$...",
+    "placeholders": {
+      "context_title": {
+        "content": "$1"
+      }
+    }
+  },
+  "btn_provider_settings": {
+    "message": "Ajustes de proveedores"
+  },
+  "options_providers_heading": {
+    "message": "Proveedores"
+  },
+  "options_configuration_heading": {
+    "message": "Configuración"
+  },
+  "options_ollama_title": {
+    "message": "Ajustes de Ollama"
+  },
+  "options_google_title": {
+    "message": "Ajustes de Google Gemini"
+  },
+  "options_openai_title": {
+    "message": "Ajustes de OpenAI"
+  },
+  "options_anthropic_title": {
+    "message": "Ajustes de Anthropic"
+  },
+  "options_chrome_builtin_title": {
+    "message": "Ajustes de Chrome Built-in AI"
+  },
+  "options_mistral_title": {
+    "message": "Ajustes de Mistral AI"
+  },
+  "options_xai_title": {
+    "message": "Ajustes de xAI (Grok)"
+  },
+  "options_deepseek_title": {
+    "message": "Ajustes de DeepSeek"
+  },
+  "label_enabled": {
+    "message": "Habilitado"
+  },
+  "label_api_key": {
+    "message": "Clave API"
+  },
+  "label_model_status": {
+    "message": "Estado del modelo"
+  },
+  "ollama_cloud_api_key_label": {
+    "message": "Clave API de Ollama Cloud (opcional)"
+  },
+  "ollama_cloud_api_key_hint": {
+    "message": "Déjalo vacío para usar Ollama local en localhost:11434."
+  },
+  "google_api_key_hint": {
+    "message": "Obtén tu clave API en"
+  },
+  "chrome_builtin_checking": {
+    "message": "Comprobando disponibilidad..."
+  },
+  "chrome_builtin_flags_hint": {
+    "message": "Usa Gemini Nano integrado en Chrome. Requiere Chrome 131+ con flags específicas activadas en chrome://flags."
+  },
+  "btn_save_ollama": {
+    "message": "Guardar ajustes de Ollama"
+  },
+  "btn_save_google": {
+    "message": "Guardar ajustes de Gemini"
+  },
+  "btn_save_openai": {
+    "message": "Guardar ajustes de OpenAI"
+  },
+  "btn_save_anthropic": {
+    "message": "Guardar ajustes de Anthropic"
+  },
+  "btn_save_settings": {
+    "message": "Guardar ajustes"
+  },
+  "msg_settings_saved": {
+    "message": "¡Ajustes guardados!"
+  },
+  "chrome_builtin_unsupported": {
+    "message": "No compatible: API de Prompt no encontrada en este navegador."
+  },
+  "chrome_builtin_available": {
+    "message": "Disponible: Gemini Nano está listo para usar."
+  },
+  "chrome_builtin_downloading": {
+    "message": "Descargando: Chrome está preparando el modelo."
+  },
+  "chrome_builtin_unavailable": {
+    "message": "No disponible: El modelo existe pero no se puede usar."
+  },
+  "msg_provider_save_error": {
+    "message": "Error al guardar la configuración."
+  },
+  "placeholder_gemini_api_key": {
+    "message": "Ingresa tu clave API de Gemini"
+  },
+  "theme_system": {
+    "message": "Sistema"
+  },
+  "theme_light": {
+    "message": "Claro"
+  },
+  "theme_dark": {
+    "message": "Oscuro"
+  },
+  "col_model": {
+    "message": "Modelo"
+  },
+  "col_model_override": {
+    "message": "Modelo personalizado"
+  },
+  "modal_answer_title": {
+    "message": "Respuesta del modelo"
+  },
+  "modal_input_title": {
+    "message": "Entrada"
+  },
+  "btn_view_answer": {
+    "message": "Ver respuesta"
+  },
+  "model_global_default": {
+    "message": "— Predeterminado global —"
+  },
+  "modal_edit_prompt_title": {
+    "message": "Editar contexto"
+  },
+  "modal_add_context_title": {
+    "message": "Agregar contexto"
+  },
+  "btn_save_prompt": {
+    "message": "Guardar"
+  },
+  "btn_cancel": {
+    "message": "Cancelar"
+  },
+  "custom_prompt_title": {
+    "message": "Instrucción personalizada"
+  },
+  "custom_prompt_placeholder": {
+    "message": "Escribe tu instrucción aquí..."
+  },
+  "btn_run_prompt": {
+    "message": "Ejecutar"
+  },
+  "custom_prompt_footer": {
+    "message": "⌘↵ Ejecutar  |  ⎋ Volver"
+  },
+  "ctx_follow_up_title": {
+    "message": "Seguimiento"
+  },
+  "follow_up_placeholder": {
+    "message": "¿Cómo mejorar esta respuesta?"
+  },
+  "btn_follow_up_submit": {
+    "message": "Refinar"
+  }
+}

@@ -1,0 +1,502 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ * Copyright (C) 2024-2026  Estefania C. Guardado, Luis Rangel
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+:root {
+  /* Golden Harvest Palette - Neutralized */
+  --color-stone: #44403C;    /* Warm Charcoal */
+  --color-amber: #F4991A;   /* Golden Amber */
+  --color-sand: #F2EAD3;    /* Soft Sand Beige */
+  --color-cream: #F9F5F0;   /* Warm Cream */
+  --color-white: #FFFFFF;
+
+  /* Semantic Mapping - Neutralized */
+  --color-moss: var(--color-stone);
+  --color-slate: var(--color-stone);
+  --color-sage: var(--color-amber);
+  --color-cream-panel: var(--color-white);
+  --color-apricot: var(--color-amber);
+  --color-light-cream: var(--color-sand);
+
+  --bg-app: var(--color-cream);
+  --bg-chat: var(--color-white);
+  --text-on-dark: var(--color-white);
+  --text-on-light: var(--color-stone);
+  
+  --border-subtle: var(--color-sand);
+
+  /* Functional Colors - Muted */
+  --color-success: #5F7D50;
+  --color-error:   #B04B4B;
+  --color-warning: #D68F1F;
+  --color-info:    #4B6E8C;
+  --color-processing: #4B6E8C;
+}
+
+[data-theme="dark"] {
+  --color-stone: #A8A29E;
+  --color-amber: #F4991A;
+  --color-sand: #3D3530;
+  --color-cream: #1C1A17;
+  --color-white: #2A2520;
+
+  --color-moss: var(--color-stone);
+  --color-slate: #E8E0D0;
+  --color-sage: #F4991A;
+  --color-cream-panel: #2A2520;
+  --color-apricot: #F4991A;
+  --color-light-cream: #3D3530;
+
+  --bg-app: #1C1A17;
+  --bg-chat: #2A2520;
+  --text-on-dark: #1C1A17;
+  --text-on-light: #E8E0D0;
+  --border-subtle: #3D3530;
+
+  /* Desaturated Functional Colors for Dark Mode */
+  --color-success: #88A682;
+  --color-error:   #D68F8F;
+  --color-warning: #FFB347;
+  --color-info:    #74A2D1;
+  --color-processing: #74A2D1;
+}
+
+#naranjo-toast-container {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 2147483647;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#naranjo-quick-menu {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2147483647;
+  background-color: var(--bg-app);
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  padding: 5px;
+  min-width: 320px;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  border: 2px solid var(--color-sage);
+  color: var(--color-slate);
+  outline: none;
+}
+
+.naranjo-hidden {
+  display: none !important;
+}
+
+.naranjo-menu-header {
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  background-color: var(--color-apricot);
+  color: var(--color-cream);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 5px;
+  text-align: center;
+  border-radius: 20px 20px 5px 5px;
+}
+
+.naranjo-menu-item {
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  color: var(--color-slate);
+  margin-bottom: 4px;
+  border: 1px solid transparent;
+}
+
+.naranjo-menu-item:hover {
+  background-color: var(--color-sand);
+  border-color: var(--color-sand);
+}
+
+.naranjo-menu-item.selected {
+  background-color: var(--color-slate);
+  color: white;
+  box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);
+  font-weight: 600;
+}
+
+.naranjo-default-badge {
+  font-size: 10px;
+  background-color: var(--color-sand);
+  color: var(--color-slate);
+  padding: 2px 8px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  font-weight: bold;
+  border: 1px solid var(--color-slate);
+}
+
+.naranjo-menu-item.selected .naranjo-default-badge {
+  background-color: var(--color-sand);
+  color: var(--color-slate);
+}
+
+.naranjo-menu-footer {
+  padding: 8px 16px 4px;
+  font-size: 11px;
+  color: var(--color-slate);
+  border-top: 1px solid var(--border-subtle);
+  margin-top: 5px;
+  text-align: center;
+  opacity: 0.8;
+  font-style: italic;
+}
+
+.naranjo-notification {
+  background-color: var(--bg-chat);
+  color: var(--text-on-light);
+  padding: 16px 20px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 300px;
+  max-width: 450px;
+  border: 1px solid var(--border-subtle);
+  border-left: 4px solid var(--color-amber);
+  animation: naranjo-slide-in 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+  pointer-events: auto;
+}
+
+.naranjo-notification.success { border-color: var(--color-success); }
+.naranjo-notification.error { border-color: var(--color-error); }
+.naranjo-notification.warning { border-color: var(--color-warning); }
+.naranjo-notification.info { border-color: var(--color-info); }
+.naranjo-notification.processing { border-color: var(--color-processing); }
+
+.naranjo-top-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.naranjo-icon {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.naranjo-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.naranjo-notification.success .naranjo-icon, 
+.naranjo-notification.success .naranjo-header { color: var(--color-success); }
+
+.naranjo-notification.error .naranjo-icon,
+.naranjo-notification.error .naranjo-header { color: var(--color-error); }
+
+.naranjo-notification.warning .naranjo-icon,
+.naranjo-notification.warning .naranjo-header { color: var(--color-warning); }
+
+.naranjo-notification.info .naranjo-icon,
+.naranjo-notification.info .naranjo-header { color: var(--color-info); }
+
+.naranjo-notification.processing .naranjo-icon,
+.naranjo-notification.processing .naranjo-header { 
+  color: var(--color-processing); 
+}
+
+.naranjo-notification.processing .naranjo-icon {
+  animation: naranjo-spin 2s linear infinite;
+}
+
+@keyframes naranjo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.naranjo-header {
+  flex: 1;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.naranjo-message {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-on-light);
+  max-height: 240px;
+  overflow-y: auto;
+  overflow-wrap: break-word;
+  padding-right: 8px;
+
+  /* Scroll shadows to indicate more content */
+  background:
+    /* Shadow covers */
+    linear-gradient(var(--bg-chat) 30%, rgba(255, 255, 255, 0)),
+    linear-gradient(rgba(255, 255, 255, 0), var(--bg-chat) 70%) 0 100%,
+    /* Shadows */
+    radial-gradient(farthest-side at 50% 0, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0)),
+    radial-gradient(farthest-side at 50% 100%, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0)) 0 100%;
+  background-repeat: no-repeat;
+  background-color: var(--bg-chat);
+  background-size: 100% 40px, 100% 40px, 100% 14px, 100% 14px;
+  background-attachment: local, local, scroll, scroll;
+}
+
+.naranjo-message::-webkit-scrollbar {
+  width: 6px;
+}
+.naranjo-message::-webkit-scrollbar-track {
+  background: transparent;
+}
+.naranjo-message::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+  border-radius: 10px;
+}
+.naranjo-message::-webkit-scrollbar-thumb:hover {
+  background: var(--color-sage);
+}
+.naranjo-message p { margin: 0 0 6px; }
+.naranjo-message p:last-child { margin-bottom: 0; }
+.naranjo-message h1, .naranjo-message h2, .naranjo-message h3 {
+  margin: 8px 0 4px; font-weight: 600; font-size: 14px;
+}
+.naranjo-message ul, .naranjo-message ol { padding-left: 18px; margin: 0 0 6px; }
+.naranjo-message li { margin: 1px 0; }
+.naranjo-message code {
+  font-family: monospace; font-size: 12px;
+  background: rgba(0, 0, 0, 0.07); padding: 1px 4px; border-radius: 3px;
+}
+.naranjo-message pre {
+  background: rgba(0, 0, 0, 0.07); padding: 8px; border-radius: 4px;
+  overflow-x: auto; margin: 6px 0; font-size: 12px;
+}
+.naranjo-message pre code { background: none; padding: 0; }
+.naranjo-message hr { border: none; border-top: 1px solid var(--border-subtle); margin: 8px 0; }
+.naranjo-message strong { font-weight: 600; }
+.naranjo-message em { font-style: italic; }
+
+@keyframes naranjo-slide-in {
+  from { transform: translateX(120%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes naranjo-fade-out {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(120%); opacity: 0; }
+}
+.naranjo-notification.fade-out {
+  animation: naranjo-fade-out 0.4s ease-in forwards;
+}
+.naranjo-close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-slate);
+  padding: 2px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+.naranjo-close-btn:hover { opacity: 1; }
+.naranjo-close-btn svg { width: 14px; height: 14px; }
+.naranjo-report-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-slate);
+  padding: 2px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+.naranjo-report-btn:hover { opacity: 1; }
+.naranjo-report-btn svg { width: 14px; height: 14px; }
+
+.naranjo-custom-prompt-item {
+  border-top: 1px solid var(--border-subtle);
+  margin-top: 4px;
+  padding-top: 12px;
+  color: var(--color-sage);
+  font-style: italic;
+}
+
+.naranjo-custom-prompt-item:hover {
+  background-color: var(--color-sand);
+  border-color: var(--color-sand);
+  color: var(--color-slate);
+}
+
+.naranjo-custom-prompt-item.selected {
+  background-color: var(--color-slate);
+  color: white;
+  box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);
+  font-weight: 600;
+  font-style: normal;
+}
+
+.naranjo-custom-prompt-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-size: 13px;
+  color: var(--color-slate);
+  background-color: var(--bg-chat);
+  resize: vertical;
+  outline: none;
+  margin: 8px 0;
+  display: block;
+}
+
+.naranjo-custom-prompt-input:focus {
+  border-color: var(--color-sage);
+}
+
+.naranjo-custom-prompt-action-select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px 10px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-size: 13px;
+  color: var(--color-slate);
+  background-color: var(--bg-chat);
+  outline: none;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+.naranjo-custom-prompt-action-select:focus {
+  border-color: var(--color-sage);
+}
+
+.naranjo-custom-prompt-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 4px 0 6px;
+}
+
+.naranjo-custom-prompt-btn {
+  padding: 6px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.naranjo-custom-prompt-btn--primary {
+  background-color: var(--color-sage);
+  color: var(--color-cream);
+  border-color: var(--color-sage);
+}
+
+.naranjo-custom-prompt-btn--primary:hover {
+  opacity: 0.85;
+}
+
+.naranjo-custom-prompt-btn--secondary {
+  background-color: transparent;
+  color: var(--color-slate);
+  border-color: var(--border-subtle);
+}
+
+.naranjo-custom-prompt-btn--secondary:hover {
+  background-color: var(--color-sand);
+}
+
+/* ── Follow-up input area (inside SUCCESS toasts) ───────────────────────── */
+.naranjo-followup {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.naranjo-followup input[type="text"] {
+  flex: 1;
+  padding: 5px 9px;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  font-size: 12px;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background-color: var(--bg-chat);
+  color: var(--color-slate);
+  outline: none;
+}
+
+.naranjo-followup input[type="text"]:focus {
+  border-color: var(--color-sage);
+}
+
+.naranjo-followup-btn {
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  cursor: pointer;
+  border: 1px solid var(--color-sage);
+  background-color: var(--color-sage);
+  color: var(--color-cream);
+  transition: opacity 0.15s ease;
+  white-space: nowrap;
+}
+
+.naranjo-followup-btn:hover {
+  opacity: 0.85;
+}
+
+.naranjo-followup input[type="text"]:disabled,
+.naranjo-followup-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

@@ -1,0 +1,50 @@
+{
+  "name": "naranjo",
+  "version": "0.3.0",
+  "license": "GPL-3.0-or-later",
+  "type": "module",
+  "description": "Multi-provider AI text processing directly in your browser",
+  "private": true,
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "dependencies": {
+    "tslib": "^2.7.0",
+    "webextension-polyfill": "^0.12.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^25.3.2",
+    "@types/webextension-polyfill": "^0.12.1",
+    "jest": "^30.3.0",
+    "jest-environment-jsdom": "^30.3.0",
+    "rimraf": "^6.0.1",
+    "rollup-plugin-copy": "^3.5.0",
+    "ts-jest": "^29.4.6",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.2",
+    "vite": "^8.0.0"
+  },
+  "scripts": {
+    "build": "npm run clean:build && npm run build:extension && npm run build:service-worker && npm run build:content-script",
+    "build:content-script": "tsc && vite build --config vite-config/content-script.ts",
+    "build:service-worker": "tsc && vite build --config vite-config/service-worker.ts",
+    "build:extension": "tsc && vite build --config vite-config/extension.ts",
+    "clean:build": "rimraf dist tsconfig.tsbuildinfo",
+    "test": "jest --runInBand --forceExit --detectOpenHandles --verbose --bail",
+    "ts-check": "tsc --noEmit --skipLibCheck",
+    "ts-check:watch": "tsc --noEmit --skipLibCheck --watch"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

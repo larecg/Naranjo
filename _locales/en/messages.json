@@ -1,0 +1,384 @@
+{
+  "extName": {
+    "message": "Naranjo"
+  },
+  "extDescription": {
+    "message": "Multi-provider AI text processing directly in your browser"
+  },
+  "action_title": {
+    "message": "Click to open Naranjo"
+  },
+  "tab_activity": {
+    "message": "Activity"
+  },
+  "tab_settings": {
+    "message": "Settings"
+  },
+  "tab_help": {
+    "message": "Help"
+  },
+  "activity_header": {
+    "message": "Recent Activity"
+  },
+  "btn_clear_all": {
+    "message": "Clear All"
+  },
+  "activity_empty": {
+    "message": "All caught up! No recent activity to show."
+  },
+  "col_date": {
+    "message": "Date"
+  },
+  "col_context": {
+    "message": "Context"
+  },
+  "col_input": {
+    "message": "Input"
+  },
+  "col_status": {
+    "message": "Status"
+  },
+  "col_actions": {
+    "message": "Actions"
+  },
+  "label_select_model": {
+    "message": "Select model"
+  },
+  "col_title": {
+    "message": "Title"
+  },
+  "col_prompt": {
+    "message": "Prompt"
+  },
+  "col_action": {
+    "message": "Action"
+  },
+  "help_getting_started": {
+    "message": "Getting Started"
+  },
+  "help_step1_title": {
+    "message": "Configure a Provider"
+  },
+  "help_step1_desc": {
+    "message": "Set up your preferred AI provider (Ollama, OpenAI, Gemini, and more) in Settings."
+  },
+  "help_step2_title": {
+    "message": "Select Model"
+  },
+  "help_step2_desc": {
+    "message": "Choose your preferred LLM in Settings."
+  },
+  "help_step3_title": {
+    "message": "Go!"
+  },
+  "help_step3_desc": {
+    "message": "Select text and press the shortcut."
+  },
+  "help_faq_title": {
+    "message": "Frequently Asked Questions"
+  },
+  "help_faq1_title": {
+    "message": "How do I use it?"
+  },
+  "help_faq1_desc": {
+    "message": "Highlight any text on a webpage to open the quick menu and choose an action. You can also type a custom one-time prompt directly from the quick menu."
+  },
+  "help_faq2_title": {
+    "message": "What's the shortcut?"
+  },
+  "help_faq2_desc": {
+    "message": "By default, press <code>Opt+Shift+Q</code> (Mac) or <code>Alt+Shift+Q</code> (Win) to open the selection menu. You can customize these in Chrome settings."
+  },
+  "help_faq3_title": {
+    "message": "Can I change the predefined shortcuts? How?"
+  },
+  "help_faq3_text": {
+    "message": "Yes! If shortcuts conflict with other plugins or you prefer different ones, you can change them in Chrome settings:"
+  },
+  "help_faq4_title": {
+    "message": "Can I do it faster?"
+  },
+  "help_faq4_desc": {
+    "message": "Use the <code>Opt+Shift+R</code> shortcut (default) to immediately run your default context on selected text without opening the menu."
+  },
+  "help_faq5_title": {
+    "message": "How do I customize prompts?"
+  },
+  "help_faq5_desc": {
+    "message": "Go to Settings tab to add, edit, or delete your own custom contexts and prompts."
+  },
+  "help_faq6_title": {
+    "message": "Why is it not working?"
+  },
+  "help_faq6_desc": {
+    "message": "Make sure your AI provider is configured and enabled in Settings, and that you have selected a model. For Ollama, ensure the server is running locally."
+  },
+  "community_title": {
+    "message": "Community & Resources"
+  },
+  "community_text": {
+    "message": "Want to contribute or report an issue? Join us on GitHub."
+  },
+  "btn_view_repo": {
+    "message": "View Repository"
+  },
+  "btn_report_bug": {
+    "message": "Report bug on GitHub"
+  },
+  "error_unknown": {
+    "message": "Unknown error"
+  },
+  "menu_header": {
+    "message": "Naranjo Actions"
+  },
+  "msg_select_text": {
+    "message": "Please select some text first"
+  },
+  "menu_footer": {
+    "message": "↵ Run  |  ⌥↵ Set Default  |  ⎋ Close"
+  },
+  "badge_default": {
+    "message": "Default"
+  },
+  "set_as_default": {
+    "message": "\"$CONTEXT_NAME$\" set as default",
+    "placeholders": {
+      "context_name": {
+        "content": "$1"
+      }
+    }
+  },
+  "toast_header": {
+    "message": "Naranjo Extension"
+  },
+  "ctx_translate_title": {
+    "message": "Translate"
+  },
+  "ctx_translate_prompt": {
+    "message": "Translate the following text to English, avoid explanations"
+  },
+  "ctx_fix_grammar_title": {
+    "message": "Fix grammar"
+  },
+  "ctx_fix_grammar_prompt": {
+    "message": "Remove typos and improve grammar of the following text, avoid explanations"
+  },
+  "ctx_explain_it_title": {
+    "message": "Explain it"
+  },
+  "ctx_explain_it_prompt": {
+    "message": "Please explain step by step the following text"
+  },
+  "ctx_rephrase_it_title": {
+    "message": "Rephrase it"
+  },
+  "ctx_rephrase_it_prompt": {
+    "message": "Please rephrase the following text, avoid explanations"
+  },
+  "ctx_synonymous_title": {
+    "message": "Synonymous"
+  },
+  "ctx_synonymous_prompt": {
+    "message": "Please give me a synonymous of the following text, avoid explanations"
+  },
+  "ctx_antonym_title": {
+    "message": "Antonym"
+  },
+  "ctx_antonym_prompt": {
+    "message": "Please give me a antonym of the following text, avoid explanations"
+  },
+  "action_replace": {
+    "message": "replace"
+  },
+  "action_alert": {
+    "message": "alert"
+  },
+  "msg_context_restored": {
+    "message": "Context restored to last saved state"
+  },
+  "msg_context_restore_error": {
+    "message": "Error restoring context"
+  },
+  "msg_context_deleted": {
+    "message": "Context deleted successfully"
+  },
+  "msg_context_delete_error": {
+    "message": "Error deleting context"
+  },
+  "msg_changes_saved": {
+    "message": "All changes saved successfully"
+  },
+  "msg_changes_save_error": {
+    "message": "Error saving some changes"
+  },
+  "msg_fill_all_fields": {
+    "message": "Please fill in all fields"
+  },
+  "msg_context_added": {
+    "message": "New context added successfully"
+  },
+  "msg_context_add_error": {
+    "message": "Error adding new context"
+  },
+  "processing_request": {
+    "message": "Processing request: $CONTEXT_TITLE$...",
+    "placeholders": {
+      "context_title": {
+        "content": "$1"
+      }
+    }
+  },
+  "btn_provider_settings": {
+    "message": "Provider Settings"
+  },
+  "options_providers_heading": {
+    "message": "Providers"
+  },
+  "options_configuration_heading": {
+    "message": "Configuration"
+  },
+  "options_ollama_title": {
+    "message": "Ollama Settings"
+  },
+  "options_google_title": {
+    "message": "Google Gemini Settings"
+  },
+  "options_openai_title": {
+    "message": "OpenAI Settings"
+  },
+  "options_anthropic_title": {
+    "message": "Anthropic Settings"
+  },
+  "options_chrome_builtin_title": {
+    "message": "Chrome Built-in AI Settings"
+  },
+  "options_mistral_title": {
+    "message": "Mistral AI Settings"
+  },
+  "options_xai_title": {
+    "message": "xAI (Grok) Settings"
+  },
+  "options_deepseek_title": {
+    "message": "DeepSeek Settings"
+  },
+  "label_enabled": {
+    "message": "Enabled"
+  },
+  "label_api_key": {
+    "message": "API Key"
+  },
+  "label_model_status": {
+    "message": "Model Status"
+  },
+  "ollama_cloud_api_key_label": {
+    "message": "Ollama Cloud API Key (optional)"
+  },
+  "ollama_cloud_api_key_hint": {
+    "message": "Leave empty to use local Ollama at localhost:11434."
+  },
+  "google_api_key_hint": {
+    "message": "Get your API key from the"
+  },
+  "chrome_builtin_checking": {
+    "message": "Checking availability..."
+  },
+  "chrome_builtin_flags_hint": {
+    "message": "Uses Gemini Nano built into Chrome. Requires Chrome 131+ with specific flags enabled in chrome://flags."
+  },
+  "btn_save_ollama": {
+    "message": "Save Ollama Settings"
+  },
+  "btn_save_google": {
+    "message": "Save Gemini Settings"
+  },
+  "btn_save_openai": {
+    "message": "Save OpenAI Settings"
+  },
+  "btn_save_anthropic": {
+    "message": "Save Anthropic Settings"
+  },
+  "btn_save_settings": {
+    "message": "Save Settings"
+  },
+  "msg_settings_saved": {
+    "message": "Settings saved!"
+  },
+  "chrome_builtin_unsupported": {
+    "message": "Unsupported: Prompt API not found in this browser."
+  },
+  "chrome_builtin_available": {
+    "message": "Available: Gemini Nano is ready to use."
+  },
+  "chrome_builtin_downloading": {
+    "message": "Downloading: Model is being prepared by Chrome."
+  },
+  "chrome_builtin_unavailable": {
+    "message": "Unavailable: Model exists but cannot be used."
+  },
+  "msg_provider_save_error": {
+    "message": "Failed to save configuration."
+  },
+  "placeholder_gemini_api_key": {
+    "message": "Enter your Gemini API key"
+  },
+  "theme_system": {
+    "message": "System"
+  },
+  "theme_light": {
+    "message": "Light"
+  },
+  "theme_dark": {
+    "message": "Dark"
+  },
+  "col_model": {
+    "message": "Model"
+  },
+  "col_model_override": {
+    "message": "Model Override"
+  },
+  "modal_answer_title": {
+    "message": "LLM Answer"
+  },
+  "modal_input_title": {
+    "message": "Input"
+  },
+  "btn_view_answer": {
+    "message": "View answer"
+  },
+  "model_global_default": {
+    "message": "— Global default —"
+  },
+  "modal_edit_prompt_title": {
+    "message": "Edit Context"
+  },
+  "modal_add_context_title": {
+    "message": "Add Context"
+  },
+  "btn_save_prompt": {
+    "message": "Save"
+  },
+  "btn_cancel": {
+    "message": "Cancel"
+  },
+  "custom_prompt_title": {
+    "message": "Custom Prompt"
+  },
+  "custom_prompt_placeholder": {
+    "message": "Enter your prompt here..."
+  },
+  "btn_run_prompt": {
+    "message": "Run"
+  },
+  "custom_prompt_footer": {
+    "message": "⌘↵ Run  |  ⎋ Back"
+  },
+  "ctx_follow_up_title": {
+    "message": "Follow-up"
+  },
+  "follow_up_placeholder": {
+    "message": "How should this be improved?"
+  },
+  "btn_follow_up_submit": {
+    "message": "Refine"
+  }
+}

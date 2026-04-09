@@ -1,0 +1,79 @@
+{
+  "name": "__MSG_extName__",
+  "version": "$EXTENSION_VERSION",
+  "manifest_version": 3,
+  "description": "__MSG_extDescription__",
+  "default_locale": "en",
+  "minimum_chrome_version": "124",
+  "icons": {
+    "16": "icon16x16.png",
+    "32": "icon32x32.png",
+    "48": "icon48x48.png",
+    "128": "icon128x128.png"
+  },
+  "action": {
+    "default_icon": {
+      "16": "icon16x16.png",
+      "32": "icon32x32.png",
+      "48": "icon48x48.png",
+      "128": "icon128x128.png"
+    },
+    "default_title": "__MSG_action_title__",
+    "default_popup": "index.html"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["contentScript.js"],
+      "all_frames": false,
+      "run_at": "document_end"
+    }
+  ],
+  "permissions": [
+    "contextMenus",
+    "tabs",
+    "activeTab",
+    "storage"
+  ],
+  "host_permissions": [
+    "http://localhost:11434/*",
+    "https://ollama.com/*",
+    "https://api.anthropic.com/*",
+    "https://api.deepseek.com/*",
+    "https://generativelanguage.googleapis.com/*",
+    "https://api.mistral.ai/*",
+    "https://api.openai.com/*",
+    "https://api.x.ai/*"
+  ],
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Alt+Shift+O",
+        "mac": "Alt+Shift+O"
+      },
+      "description": "Open Naranjo"
+    },
+    "open-quick-menu": {
+      "suggested_key": {
+        "default": "Alt+Shift+Q",
+        "mac": "Alt+Shift+Q"
+      },
+      "description": "Open Quick Naranjo Selection Menu"
+    },
+    "run-default-context": {
+      "suggested_key": {
+        "default": "Alt+Shift+R",
+        "mac": "Alt+Shift+R"
+      },
+      "description": "Run Default Naranjo Context"
+    }
+  }
+}

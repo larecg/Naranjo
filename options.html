@@ -1,0 +1,307 @@
+<!--
+  SPDX-License-Identifier: GPL-3.0-or-later
+  Copyright (C) 2024-2026  Estefania C. Guardado, Luis Rangel
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Naranjo Settings</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #333333;
+            --border-color: #e5e7eb;
+            --primary-color: #f97316;
+            --primary-hover: #ea580c;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #1f2937;
+                --text-color: #f3f4f6;
+                --border-color: #374151;
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .container {
+            display: flex;
+            width: 100%;
+            max-width: 900px;
+            min-height: 500px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        .sidebar {
+            width: 250px;
+            border-right: 1px solid var(--border-color);
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        .sidebar h2 {
+            padding: 15px 20px;
+            margin: 0;
+            font-size: 1.2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .provider-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .provider-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.2s;
+        }
+
+        .provider-item:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .provider-item.active {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: bold;
+        }
+
+        .content {
+            flex-grow: 1;
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: transparent;
+            color: inherit;
+            box-sizing: border-box;
+        }
+
+        input[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .status {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .status.success {
+            display: block;
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .provider-section {
+            display: none;
+        }
+
+        .provider-section.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2 data-i18n="options_providers_heading">Providers</h2>
+            <ul class="provider-list">
+                <li class="provider-item active" data-provider="ollama">Ollama</li>
+                <li class="provider-item" data-provider="google">Google Gemini</li>
+                <li class="provider-item" data-provider="openai">OpenAI</li>
+                <li class="provider-item" data-provider="anthropic">Anthropic Claude</li>
+                <li class="provider-item" data-provider="mistral">Mistral AI</li>
+                <li class="provider-item" data-provider="xai">xAI (Grok)</li>
+                <li class="provider-item" data-provider="deepseek">DeepSeek</li>
+                <li class="provider-item" data-provider="chrome-builtin">Chrome Built-in AI</li>
+            </ul>
+        </div>
+        <div class="content">
+            <h1 data-i18n="options_configuration_heading">Configuration</h1>
+
+            <div id="ollama-section" class="provider-section active">
+                <h2 data-i18n="options_ollama_title">Ollama Settings</h2>
+                <div class="form-group">
+                    <label for="ollama-enabled" data-i18n="label_enabled">Enabled</label>
+                    <input type="checkbox" id="ollama-enabled" checked>
+                </div>
+                <div class="form-group">
+                    <label for="ollama-cloud-api-key" data-i18n="ollama_cloud_api_key_label">Ollama Cloud API Key (optional)</label>
+                    <input type="text" id="ollama-cloud-api-key" placeholder="">
+                    <p style="font-size: 0.85em; color: gray;" data-i18n="ollama_cloud_api_key_hint">Leave empty to use local Ollama at localhost:11434.</p>
+                </div>
+                <button id="save-ollama-btn" data-i18n="btn_save_ollama">Save Ollama Settings</button>
+                <div id="status-ollama" class="status" data-i18n="msg_settings_saved">Settings saved!</div>
+            </div>
+
+            <div id="google-section" class="provider-section">
+                <h2 data-i18n="options_google_title">Google Gemini Settings</h2>
+                <div class="form-group">
+                    <label for="google-enabled" data-i18n="label_enabled">Enabled</label>
+                    <input type="checkbox" id="google-enabled">
+                </div>
+                <div class="form-group">
+                    <label for="google-api-key" data-i18n="label_api_key">API Key</label>
+                    <input type="text" id="google-api-key" placeholder="Enter your Gemini API key" data-i18n-placeholder="placeholder_gemini_api_key">
+                    <p style="font-size: 0.85em; color: gray;"><span data-i18n="google_api_key_hint">Get your API key from the</span> <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a>.</p>
+                </div>
+                <button id="save-google-btn" data-i18n="btn_save_google">Save Gemini Settings</button>
+                <div id="status-google" class="status" data-i18n="msg_settings_saved">Settings saved!</div>
+            </div>
+
+            <div id="openai-section" class="provider-section">
+                <h2 data-i18n="options_openai_title">OpenAI Settings</h2>
+                <div class="form-group">
+                    <label for="openai-enabled" data-i18n="label_enabled">Enabled</label>
+                    <input type="checkbox" id="openai-enabled">
+                </div>
+                <div class="form-group">
+                    <label for="openai-api-key" data-i18n="label_api_key">API Key</label>
+                    <input type="text" id="openai-api-key" placeholder="sk-...">
+                </div>
+                <button id="save-openai-btn" data-i18n="btn_save_openai">Save OpenAI Settings</button>
+                <div id="status-openai" class="status" data-i18n="msg_settings_saved">Settings saved!</div>
+            </div>
+
+            <div id="anthropic-section" class="provider-section">
+                <h2 data-i18n="options_anthropic_title">Anthropic Settings</h2>
+                <div class="form-group">
+                    <label for="anthropic-enabled" data-i18n="label_enabled">Enabled</label>
+                    <input type="checkbox" id="anthropic-enabled">
+                </div>
+                <div class="form-group">
+                    <label for="anthropic-api-key" data-i18n="label_api_key">API Key</label>
+                    <input type="text" id="anthropic-api-key" placeholder="sk-ant-...">
+                </div>
+                <button id="save-anthropic-btn" data-i18n="btn_save_anthropic">Save Anthropic Settings</button>
+                <div id="status-anthropic" class="status" data-i18n="msg_settings_saved">Settings saved!</div>
+            </div>
+
+            <div id="mistral-section" class="provider-section">
+                <h2 data-i18n="options_mistral_title">Mistral AI Settings</h2>
+                <div class="form-group">
+                    <label for="mistral-enabled" data-i18n="label_enabled">Enabled</label>
+                    <input type="checkbox" id="mistral-enabled">
+                </div>
+                <div class="form-group">
+                    <label for="mistral-api-key" data-i18n="label_api_key">API Key</label>
+                    <input type="text" id="mistral-api-key" placeholder="Enter your Mistral API key">
+                </div>
+                <button id="save-mistral-btn" data-i18n="btn_save_settings">Save Mistral Settings</button>
+                <div id="status-mistral" class="status" data-i18n="msg_settings_saved">Settings saved!</div>
+            </div>
+
+            <div id="xai-section" class="provider-section">
+                <h2 data-i18n="options_xai_title">xAI (Grok) Settings</h2>
+                <div class="form-group">
+                    <label for="xai-enabled" data-i18n="label_enabled">Enabled</label>
+                    <input type="checkbox" id="xai-enabled">
+                </div>
+                <div class="form-group">
+                    <label for="xai-api-key" data-i18n="label_api_key">API Key</label>
+                    <input type="text" id="xai-api-key" placeholder="xai-...">
+                </div>
+                <button id="save-xai-btn" data-i18n="btn_save_settings">Save xAI Settings</button>
+                <div id="status-xai" class="status" data-i18n="msg_settings_saved">Settings saved!</div>
+            </div>
+
+            <div id="deepseek-section" class="provider-section">
+                <h2 data-i18n="options_deepseek_title">DeepSeek Settings</h2>
+                <div class="form-group">
+                    <label for="deepseek-enabled" data-i18n="label_enabled">Enabled</label>
+                    <input type="checkbox" id="deepseek-enabled">
+                </div>
+                <div class="form-group">
+                    <label for="deepseek-api-key" data-i18n="label_api_key">API Key</label>
+                    <input type="text" id="deepseek-api-key" placeholder="Enter your DeepSeek API key">
+                </div>
+                <button id="save-deepseek-btn" data-i18n="btn_save_settings">Save DeepSeek Settings</button>
+                <div id="status-deepseek" class="status" data-i18n="msg_settings_saved">Settings saved!</div>
+            </div>
+
+            <div id="chrome-builtin-section" class="provider-section">
+                <h2 data-i18n="options_chrome_builtin_title">Chrome Built-in AI Settings</h2>
+                <div class="form-group">
+                    <label for="chrome-builtin-enabled" data-i18n="label_enabled">Enabled</label>
+                    <input type="checkbox" id="chrome-builtin-enabled">
+                </div>
+                <div class="form-group" style="padding: 15px; background: rgba(0,0,0,0.05); border-radius: 8px;">
+                    <label data-i18n="label_model_status">Model Status</label>
+                    <p id="chrome-builtin-status">Checking availability...</p>
+                    <p style="font-size: 0.85em; color: gray; margin-top: 10px;" data-i18n="chrome_builtin_flags_hint">
+                        Uses Gemini Nano built into Chrome. Requires Chrome 131+ with specific flags enabled in chrome://flags.
+                    </p>
+                </div>
+                <button id="save-chrome-builtin-btn" data-i18n="btn_save_settings">Save Settings</button>
+                <div id="status-chrome-builtin" class="status" data-i18n="msg_settings_saved">Settings saved!</div>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="options.js"></script>
+</body>
+</html>
