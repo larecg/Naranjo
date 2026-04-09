@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title data-i18n="title">Naranjo — AI text processing in your browser</title>
+  <meta name="description" data-i18n="metaDescription" content="Naranjo — process selected text on any webpage with AI. Supports OpenAI, Claude, Gemini, Mistral, xAI Grok, DeepSeek, Ollama, and Chrome Built-in AI." />
   <link rel="icon" href="icon.png" type="image/png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -20,7 +21,8 @@
       --color-chrome: #A0522D;
       --text-primary: #344F1F;
       --text-muted:   #6b7280;
-      --border:       #F2EAD3;
+      --border:       #e5ddd0;
+      --shadow-panel: 0 4px 20px rgba(52, 79, 31, 0.06);
     }
 
     @media (prefers-color-scheme: dark) {
@@ -34,6 +36,7 @@
         --text-primary: #E8E0D0;
         --text-muted:   #9ca3af;
         --border:       #3D3530;
+        --shadow-panel: 0 4px 20px rgba(0, 0, 0, 0.2);
       }
     }
 
@@ -45,55 +48,205 @@
       display: flex;
       flex-direction: column;
       align-items: stretch;
-      text-align: center;
     }
 
-    .main-content {
-      flex: 1;
+    /* ── Hero ── */
+    .hero {
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 2rem 0;
+      text-align: center;
+      padding: 4rem 1.5rem 3rem;
     }
 
     .logo {
-      width: 72px;
-      height: 72px;
-      border-radius: 18px;
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
       margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-panel);
+    }
+
+    .version-badge {
+      display: inline-block;
+      background: var(--color-sand);
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.85rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      margin-bottom: 1.25rem;
     }
 
     h1 {
-      font-size: 2.5rem;
+      font-size: 2.75rem;
       font-weight: 700;
       letter-spacing: 0.05em;
       text-transform: uppercase;
       color: var(--color-amber);
-      margin-bottom: 0.5rem;
+      margin-bottom: 1rem;
     }
 
     .tagline {
-      font-size: 1rem;
+      font-size: 1.1rem;
       color: var(--text-muted);
-      margin-bottom: 2.5rem;
-      max-width: 420px;
+      max-width: 560px;
+      line-height: 1.6;
+      margin-bottom: 2rem;
     }
 
-    .badge {
-      display: inline-block;
-      background: var(--color-sand);
-      color: var(--text-primary);
-      font-size: 0.8rem;
+    .cta-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--color-amber);
+      color: #fff;
+      font-size: 1rem;
       font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      padding: 0.4rem 1rem;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      margin-bottom: 3rem;
+      padding: 0.85rem 2rem;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: opacity 0.15s, transform 0.15s;
+      box-shadow: 0 2px 8px rgba(244, 153, 26, 0.35);
     }
 
+    .cta-button:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .cta-button svg {
+      flex-shrink: 0;
+    }
+
+    /* ── How it works ── */
+    .how-it-works {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 2.5rem 1.5rem;
+      background: var(--color-white);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--color-amber);
+      margin-bottom: 0.75rem;
+    }
+
+    .how-it-works p {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      max-width: 600px;
+      line-height: 1.7;
+    }
+
+    .how-it-works strong {
+      color: var(--text-primary);
+    }
+
+    /* ── Features ── */
+    .features {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 3rem 1.5rem;
+    }
+
+    .features > .section-label {
+      margin-bottom: 2rem;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+      max-width: 860px;
+      width: 100%;
+    }
+
+    .feature-card {
+      background: var(--color-white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      text-align: left;
+      box-shadow: var(--shadow-panel);
+    }
+
+    .feature-icon {
+      font-size: 1.4rem;
+      margin-bottom: 0.6rem;
+      display: block;
+    }
+
+    .feature-card h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.35rem;
+    }
+
+    .feature-card p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* ── Providers ── */
+    .providers {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2.5rem 1.5rem;
+      background: var(--color-white);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .providers > .section-label {
+      margin-bottom: 1.5rem;
+    }
+
+    .providers-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.6rem;
+      max-width: 720px;
+    }
+
+    .provider-pill {
+      background: var(--color-sand);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.4rem 1rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .provider-pill.local {
+      border-color: var(--color-amber);
+      color: var(--color-amber);
+    }
+
+    .providers-note {
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* ── Footer ── */
     footer {
       width: 100%;
       background: var(--color-chrome);
@@ -101,6 +254,7 @@
       text-align: center;
       font-size: 0.8rem;
       padding: 1.5rem;
+      margin-top: auto;
     }
 
     footer a {
@@ -121,7 +275,39 @@
       gap: 0.5rem;
     }
 
+    /* ── GitHub corner ── */
+    .github-corner {
+      position: fixed;
+      top: 0;
+      right: 0;
+      z-index: 100;
+    }
+
+    .github-corner svg {
+      fill: #A0522D;
+      color: #fff;
+      width: 72px;
+      height: 72px;
+    }
+
+    .github-corner:hover .octo-arm {
+      animation: octocat-wave 560ms ease-in-out;
+    }
+
+    @keyframes octocat-wave {
+      0%, 100% { transform: rotate(0); }
+      20%, 60% { transform: rotate(-25deg); }
+      40%, 80% { transform: rotate(10deg); }
+    }
+
+    @media (max-width: 500px) {
+      .github-corner:hover .octo-arm { animation: none; }
+      .github-corner .octo-arm { animation: octocat-wave 560ms ease-in-out; }
+    }
+
     @media (max-width: 600px) {
+      h1 { font-size: 2rem; }
+
       footer .footer-inner {
         flex-direction: column;
         justify-content: center;
@@ -132,13 +318,95 @@
 </head>
 <body>
 
-  <div class="main-content">
-    <img src="icon.png" alt="Naranjo icon" class="logo" />
-    <h1>Naranjo</h1>
-    <p class="tagline" data-i18n="tagline">AI text processing directly in your browser.</p>
-    <span class="badge" data-i18n="badge">Coming soon</span>
+  <!-- GitHub corner ribbon -->
+  <a href="https://github.com/larecg/Naranjo" target="_blank" rel="noopener" class="github-corner" aria-label="View source on GitHub">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+      <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+      <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" class="octo-arm" style="transform-origin: 130px 106px;"></path>
+      <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.7,65.4 C194.3,68.9 197.4,73.1 199.9,77.4 C213.6,80.1 216.0,84.8 216.0,84.8 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path>
+    </svg>
+  </a>
 
-  </div>
+  <!-- Hero -->
+  <section class="hero">
+    <img src="icon.png" alt="Naranjo icon" class="logo" />
+    <span class="version-badge">v0.3.0</span>
+    <h1>Naranjo</h1>
+    <p class="tagline" data-i18n="tagline">
+      Select any text on any webpage, right-click, and process it with your AI of choice — locally or in the cloud.
+    </p>
+    <a class="cta-button" href="https://chromewebstore.google.com/detail/naranjo/jbkbaeniloninjdcddclijkacfhlbkfd" target="_blank" rel="noopener" data-i18n-aria="ctaAriaLabel">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/>
+        <circle cx="12" cy="12" r="4" fill="currentColor"/>
+        <path d="M12 8 L20.5 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M5.27 16 L9.77 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M18.73 16 L9.5 16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      <span data-i18n="cta">Add to Chrome — it's free</span>
+    </a>
+  </section>
+
+  <!-- How it works -->
+  <section class="how-it-works">
+    <span class="section-label" data-i18n="howItWorksLabel">How it works</span>
+    <p data-i18n="howItWorksBody">
+      <strong>Select text</strong> on any webpage &rarr; <strong>right-click</strong> to open the context menu &rarr; pick an AI action. Or press <strong>Alt+Shift+Q</strong> to open the quick menu overlay, type a one-time prompt, and get a streaming response instantly.
+    </p>
+  </section>
+
+  <!-- Features -->
+  <section class="features">
+    <span class="section-label" data-i18n="featuresLabel">Features</span>
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-icon">&#128196;</span>
+        <h3 data-i18n="f1Title">Context menu on any text</h3>
+        <p data-i18n="f1Body">Right-click selected text on any webpage to run your custom AI contexts instantly.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">&#9889;</span>
+        <h3 data-i18n="f2Title">Quick menu overlay</h3>
+        <p data-i18n="f2Body">Press Alt+Shift+Q for a floating overlay. Type a one-time prompt or pick a saved context without opening the popup.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">&#128288;</span>
+        <h3 data-i18n="f3Title">Streaming responses</h3>
+        <p data-i18n="f3Body">See the AI response token-by-token in real time, directly in the extension popup.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">&#127775;</span>
+        <h3 data-i18n="f4Title">Per-context model override</h3>
+        <p data-i18n="f4Body">Assign a specific provider and model to each context — use Gemini for translation, Claude for editing, Ollama for drafts.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">&#128203;</span>
+        <h3 data-i18n="f5Title">Task history</h3>
+        <p data-i18n="f5Body">Every AI operation is saved with its full input, output, and model — searchable anytime.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">&#127760;</span>
+        <h3 data-i18n="f6Title">English &amp; Spanish</h3>
+        <p data-i18n="f6Body">Full interface localization for English and Spanish, with system, light, and dark theme support.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Providers -->
+  <section class="providers">
+    <span class="section-label" data-i18n="providersLabel">Supported providers</span>
+    <div class="providers-row">
+      <span class="provider-pill local" data-i18n="p1">Ollama (local)</span>
+      <span class="provider-pill local" data-i18n="p2">Chrome Built-in AI (local)</span>
+      <span class="provider-pill" data-i18n="p3">OpenAI</span>
+      <span class="provider-pill" data-i18n="p4">Google Gemini</span>
+      <span class="provider-pill" data-i18n="p5">Anthropic Claude</span>
+      <span class="provider-pill" data-i18n="p6">Mistral AI</span>
+      <span class="provider-pill" data-i18n="p7">xAI Grok</span>
+      <span class="provider-pill" data-i18n="p8">DeepSeek</span>
+    </div>
+    <p class="providers-note" data-i18n="providersNote">Local providers run entirely on your machine — no data leaves your browser.</p>
+  </section>
 
   <footer>
     <div class="footer-inner">
@@ -147,17 +415,44 @@
       <span><span data-i18n="licensedUnder">Licensed under</span> <a href="https://www.gnu.org/licenses/gpl-3.0.en.html" target="_blank" rel="noopener">GPL v3.0</a></span>
     </div>
   </footer>
+
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
 
     const translations = {
       es: {
-        title:        'Naranjo — Procesamiento de texto con IA en tu navegador',
-        tagline:      'Procesamiento de texto con IA directamente en tu navegador.',
-        badge:        'Próximamente',
-        rights:       'Todos los derechos reservados.',
-        privacyPolicy:'Política de privacidad',
-        licensedUnder:'Licenciado bajo',
+        title:           'Naranjo — Procesamiento de texto con IA en tu navegador',
+        metaDescription: 'Naranjo — procesa texto seleccionado en cualquier página web con IA. Compatible con OpenAI, Claude, Gemini, Mistral, xAI Grok, DeepSeek, Ollama e IA integrada en Chrome.',
+        tagline:         'Selecciona cualquier texto en cualquier página web, haz clic derecho y procésalo con tu IA favorita, de forma local o en la nube.',
+        cta:             'Agregar a Chrome — es gratis',
+        howItWorksLabel: 'Cómo funciona',
+        howItWorksBody:  '<strong>Selecciona texto</strong> en cualquier página → <strong>clic derecho</strong> para abrir el menú contextual → elige una acción de IA. O presiona <strong>Alt+Shift+Q</strong> para abrir el menú rápido flotante, escribe un prompt y obtén una respuesta en tiempo real.',
+        featuresLabel:   'Funciones',
+        f1Title:         'Menú contextual en cualquier texto',
+        f1Body:          'Haz clic derecho sobre texto seleccionado en cualquier página para ejecutar tus contextos de IA al instante.',
+        f2Title:         'Menú rápido flotante',
+        f2Body:          'Presiona Alt+Shift+Q para un panel flotante. Escribe un prompt o elige un contexto guardado sin abrir el popup.',
+        f3Title:         'Respuestas en tiempo real',
+        f3Body:          'Visualiza la respuesta de la IA token por token directamente en el popup de la extensión.',
+        f4Title:         'Modelo por contexto',
+        f4Body:          'Asigna un proveedor y modelo específico a cada contexto: usa Gemini para traducciones, Claude para edición, Ollama para borradores.',
+        f5Title:         'Historial de tareas',
+        f5Body:          'Cada operación de IA se guarda con su entrada, salida y modelo completos, consultables en cualquier momento.',
+        f6Title:         'Inglés y español',
+        f6Body:          'Interfaz completamente localizada en inglés y español, con soporte de tema claro, oscuro y del sistema.',
+        providersLabel:  'Proveedores compatibles',
+        p1:              'Ollama (local)',
+        p2:              'IA integrada en Chrome (local)',
+        p3:              'OpenAI',
+        p4:              'Google Gemini',
+        p5:              'Anthropic Claude',
+        p6:              'Mistral AI',
+        p7:              'xAI Grok',
+        p8:              'DeepSeek',
+        providersNote:   'Los proveedores locales se ejecutan en tu máquina — ningún dato sale de tu navegador.',
+        rights:          'Todos los derechos reservados.',
+        privacyPolicy:   'Política de privacidad',
+        licensedUnder:   'Licenciado bajo',
       }
     };
 
@@ -165,10 +460,21 @@
     if (lang) {
       document.getElementById('html-root').lang = lang;
       const t = translations[lang];
+
       document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
-        if (t[key]) el.textContent = t[key];
+        if (t[key]) {
+          if (key === 'howItWorksBody') {
+            el.innerHTML = t[key];
+          } else {
+            el.textContent = t[key];
+          }
+        }
       });
+
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc && t.metaDescription) metaDesc.setAttribute('content', t.metaDescription);
+
       document.title = t.title;
     }
   </script>

@@ -1,5 +1,8 @@
 # Naranjo Browser Extension
 
+[![Chrome Web Store](https://img.shields.io/chrome-web-store/v/jbkbaeniloninjdcddclijkacfhlbkfd?label=Chrome%20Web%20Store&logo=googlechrome&logoColor=white&color=F4991A)](https://chromewebstore.google.com/detail/naranjo/jbkbaeniloninjdcddclijkacfhlbkfd)
+[![Website](https://img.shields.io/badge/Website-larecg.github.io%2FNaranjo-344F1F?logo=github&logoColor=white)](https://larecg.github.io/Naranjo/)
+
 ## Overview
 
 Naranjo is a browser extension that lets you process selected text on any webpage using AI-powered context menu actions. It supports multiple LLM providers — local (Ollama, Chrome Built-in) or cloud (OpenAI, Google, Anthropic, Mistral, xAI, DeepSeek) — with fully customizable prompt contexts.
