@@ -17,6 +17,7 @@
 import { injectStyles, TOAST_ID } from "./injectStyles";
 import { t } from "@/app/i18n";
 import { renderMarkdown } from "@/app/markdown";
+import { buildBugReportBody } from "@/app/bugReport";
 import { ErrorReportContext, NaranjoAction } from "@/entities/types";
 import { sendMessage } from "@/utils/messaging";
 
@@ -25,28 +26,97 @@ import { sendMessage } from "@/utils/messaging";
  * Logic for displaying toast notifications on the web page.
  */
 
-function buildBugReportBody(ctx: ErrorReportContext): string {
-  const model = ctx.modelId ?? "unknown";
-  const date = new Date(ctx.timestamp).toISOString();
-  return `## What happened?
+/**
+ * Stored side-effect callbacks keyed by taskId so follow-up finalizations can
+ * reuse the original callback without the caller having to track the action.
+ */
+const sideEffectCallbacks = new Map<string, (content: string) => void>();
 
-<!-- Describe the issue -->
+/**
+ * Appends Apply / Cancel buttons to a toast that has a pending side effect.
+ * The Apply button reads the latest raw content from the notification's
+ * `data-raw-content` attribute (updated on every stream completion) and
+ * invokes `onApply`. The Cancel button dismisses the toast without acting.
+ *
+ * If the buttons already exist (e.g. after the first finalization) calling
+ * this function again only updates `data-raw-content`; the existing closure
+ * already reads from the attribute dynamically.
+ *
+ * @param {HTMLElement} notification - The toast notification element.
+ * @param {string} rawContent - The latest unrendered text to store and apply.
+ * @param {(content: string) => void} onApply - Callback that executes the side effect.
+ */
+function appendSideEffectActions(
+  notification: HTMLElement,
+  rawContent: string,
+  onApply: (content: string) => void,
+): void {
+  // Always keep the stored content up to date so Apply uses the latest version.
+  notification.dataset.rawContent = rawContent;
 
-## Steps to reproduce
+  // Persist callback so follow-up finalizations can reuse it.
+  const taskId = notification.dataset.taskId;
+  if (taskId) sideEffectCallbacks.set(taskId, onApply);
 
-<!-- What were you doing when this happened? -->
+  if (notification.querySelector(".naranjo-side-effect-actions")) return;
 
----
-<details>
-<summary>Error context (review before submitting — remove sensitive information)</summary>
+  const container = document.createElement("div");
+  container.className = "naranjo-side-effect-actions";
 
-**Error:** ${ctx.errorMessage}
-**Context:** ${ctx.contextTitle}
-**Model:** ${model}
-**Extension version:** ${ctx.extensionVersion}
-**Date:** ${date}
-**Browser:** ${navigator.userAgent}
-</details>`;
+  const applyBtn = document.createElement("button");
+  applyBtn.className = "naranjo-apply-btn";
+  applyBtn.textContent = t("btn_apply_replace");
+  applyBtn.onclick = (e) => {
+    e.stopPropagation();
+    onApply(notification.dataset.rawContent ?? "");
+    if (taskId) sideEffectCallbacks.delete(taskId);
+    notification.classList.add("fade-out");
+    notification.addEventListener("animationend", () => notification.remove());
+  };
+
+  const cancelBtn = document.createElement("button");
+  cancelBtn.className = "naranjo-cancel-btn";
+  cancelBtn.textContent = t("btn_cancel");
+  cancelBtn.onclick = (e) => {
+    e.stopPropagation();
+    if (taskId) sideEffectCallbacks.delete(taskId);
+    notification.classList.add("fade-out");
+    notification.addEventListener("animationend", () => notification.remove());
+  };
+
+  container.appendChild(applyBtn);
+  container.appendChild(cancelBtn);
+  notification.appendChild(container);
+}
+
+/**
+ * Appends Apply / Cancel buttons to an existing toast identified by task ID.
+ * Also marks the notification with `data-action` so that future follow-up
+ * finalizations know to re-add the buttons with updated content.
+ *
+ * Used by the content script for the non-streaming (no chunks arrived) path
+ * and for the one-shot `replaceText` message path.
+ *
+ * @param {string} taskId - The task ID of the target toast.
+ * @param {string} rawContent - The latest unrendered text to store and apply.
+ * @param {(content: string) => void} onApply - Callback that executes the side effect.
+ */
+export function appendReplaceActionsToToast(
+  taskId: string,
+  rawContent: string,
+  onApply: (content: string) => void,
+): void {
+  const container = document.getElementById(TOAST_ID);
+  if (!container) return;
+
+  const notification = container.querySelector(
+    `.naranjo-notification[data-task-id="${taskId}"]`,
+  ) as HTMLElement | null;
+  if (!notification) return;
+
+  // Mark the action so finalizeToast re-adds the buttons after follow-ups.
+  notification.dataset.action = NaranjoAction.replaceText;
+  appendSideEffectActions(notification, rawContent, onApply);
 }
 
 /**
@@ -142,6 +212,12 @@ export function transitionToastToStreaming(taskId: string): void {
 
   const followUpEl = notification.querySelector(".naranjo-followup");
   if (followUpEl) followUpEl.remove();
+
+  // Remove side-effect action buttons — finalizeToast re-adds them with
+  // updated content once the follow-up stream finishes.
+  // data-action is intentionally preserved so finalizeToast knows to re-add them.
+  const sideEffectActionsEl = notification.querySelector(".naranjo-side-effect-actions");
+  if (sideEffectActionsEl) sideEffectActionsEl.remove();
 }
 
 /**
@@ -268,8 +344,10 @@ export function showToast(content: string, type: string, taskId?: string, errorC
  * Content should be updated incrementally via {@link updateToastContent}.
  *
  * @param {string} taskId - The task ID to associate with the notification.
+ * @param {NaranjoAction} [action] - The action being performed. When provided,
+ *   stored as `data-action` so `finalizeToast` can add side-effect buttons.
  */
-export function showStreamingToast(taskId: string): void {
+export function showStreamingToast(taskId: string, action?: NaranjoAction): void {
   injectStyles();
 
   let container = document.getElementById(TOAST_ID);
@@ -284,6 +362,7 @@ export function showStreamingToast(taskId: string): void {
   notification.dataset.type = "PROCESSING";
   notification.dataset.taskId = taskId;
   notification.dataset.streaming = "true";
+  if (action !== undefined) notification.dataset.action = action;
 
   const icon = `
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -338,10 +417,21 @@ export function updateToastContent(taskId: string, content: string): void {
  * Finalizes a streaming toast by switching it to its completed state (e.g. SUCCESS).
  * The toast remains visible indefinitely, matching the behaviour of regular SUCCESS toasts.
  *
+ * When `type` is "SUCCESS" and the notification's `data-action` corresponds to
+ * a deferred side effect (e.g. `replaceSelectedText`), Apply / Cancel buttons are
+ * appended so the user can confirm or discard the side effect after optional refinement.
+ *
  * @param {string} taskId - The task ID of the streaming toast to finalize.
  * @param {string} type - The final notification type (e.g. "SUCCESS").
+ * @param {string} [rawContent] - The final unrendered content; required to populate Apply.
+ * @param {(content: string) => void} [onApply] - Callback that executes the side effect.
  */
-export function finalizeToast(taskId: string, type: string): void {
+export function finalizeToast(
+  taskId: string,
+  type: string,
+  rawContent?: string,
+  onApply?: (content: string) => void,
+): void {
   const container = document.getElementById(TOAST_ID);
   if (!container) return;
 
@@ -364,6 +454,12 @@ export function finalizeToast(taskId: string, type: string): void {
         </svg>`;
     }
     appendFollowUpArea(notification, taskId);
+    if (rawContent !== undefined && notification.dataset.action === NaranjoAction.replaceText) {
+      const callback = onApply ?? sideEffectCallbacks.get(taskId);
+      if (callback) {
+        appendSideEffectActions(notification, rawContent, callback);
+      }
+    }
   }
   // SUCCESS toasts stay open — no auto-dismiss timer needed
 }

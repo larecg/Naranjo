@@ -320,7 +320,7 @@ export async function processQueue(): Promise<void> {
 
         const errorContext: ErrorReportContext = {
           errorMessage,
-          extensionVersion: browser.runtime.getManifest().version,
+          extensionVersion: process.env.EXTENSION_VERSION,
           contextTitle: task.contextTitle,
           modelId: task.modelId,
           timestamp: task.timestamp,

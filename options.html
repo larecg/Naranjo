@@ -194,6 +194,7 @@
                     <label for="ollama-cloud-api-key" data-i18n="ollama_cloud_api_key_label">Ollama Cloud API Key (optional)</label>
                     <input type="text" id="ollama-cloud-api-key" placeholder="">
                     <p style="font-size: 0.85em; color: gray;" data-i18n="ollama_cloud_api_key_hint">Leave empty to use local Ollama at localhost:11434.</p>
+                    <p id="ollama-origins-hint" style="font-size: 0.85em; color: gray;" data-i18n="ollama_origins_hint">To allow the extension to communicate with Ollama, set: export OLLAMA_ORIGINS="moz-extension://*,chrome-extension://*"</p>
                 </div>
                 <button id="save-ollama-btn" data-i18n="btn_save_ollama">Save Ollama Settings</button>
                 <div id="status-ollama" class="status" data-i18n="msg_settings_saved">Settings saved!</div>

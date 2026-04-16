@@ -20,6 +20,10 @@ import { ReadableStream } from "stream/web";
 // Polyfill encoding/streaming globals for jsdom (needed by streaming tests)
 Object.assign(global, { TextEncoder, TextDecoder, ReadableStream });
 
+// Inject build-time constants that Vite normally provides
+process.env.EXTENSION_VERSION = "0.0.0";
+process.env.EXTENSION_NAME = "naranjo";
+
 // Mock browser extension API
 const mockBrowser = {
   runtime: {

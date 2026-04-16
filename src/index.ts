@@ -45,9 +45,19 @@ window.addEventListener("load", () => {
   applyI18n();
   initHistory();
 
+  const versionEl = document.getElementById("app-version");
+  if (versionEl) versionEl.textContent = `v${process.env.EXTENSION_VERSION}`;
+
   const openProviderSettingsBtn = document.getElementById("open-provider-settings");
   if (openProviderSettingsBtn) {
     openProviderSettingsBtn.addEventListener("click", () => {
+      browser.runtime.openOptionsPage();
+    });
+  }
+
+  const noModelsOpenSettingsBtn = document.getElementById("no-models-open-settings");
+  if (noModelsOpenSettingsBtn) {
+    noModelsOpenSettingsBtn.addEventListener("click", () => {
       browser.runtime.openOptionsPage();
     });
   }

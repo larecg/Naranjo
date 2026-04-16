@@ -45,8 +45,11 @@ export function handleSelectedModel() {
   sendMessage({ action: "setSelectedModel", payload });
 }
 
-/** Set up select to list model options on window loads */
-window.addEventListener("load", async () => {
+/**
+ * Populates the model selector dropdown and toggles the no-models empty state.
+ * Exported for testability; called automatically on window load.
+ */
+export async function initModelSelection(): Promise<void> {
   const select = document.getElementById(
     "naranjo-models"
   ) as HTMLSelectElement;
@@ -54,6 +57,18 @@ window.addEventListener("load", async () => {
 
   const selectedIdentifier = await getSelectedModel();
   const availableModels = await getAvailableModels();
+
+  const modelSelectorWrapper = document.getElementById("model-selector-wrapper");
+  const noModelsState = document.getElementById("no-models-state");
+
+  if (availableModels.length === 0) {
+    modelSelectorWrapper?.classList.add("hidden");
+    noModelsState?.classList.remove("hidden");
+    return;
+  }
+
+  noModelsState?.classList.add("hidden");
+  modelSelectorWrapper?.classList.remove("hidden");
 
   availableModels.forEach((model) => {
     const option = document.createElement("option");
@@ -68,4 +83,7 @@ window.addEventListener("load", async () => {
 
   // Listen for changes
   select.addEventListener("change", handleSelectedModel);
-});
+}
+
+/** Set up select to list model options on window load */
+window.addEventListener("load", initModelSelection);

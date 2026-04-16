@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { showToast, dismissToast, showStreamingToast, updateToastContent, finalizeToast, transitionToastToStreaming } from "./toastOverlay";
+import { showToast, dismissToast, showStreamingToast, updateToastContent, finalizeToast, transitionToastToStreaming, appendReplaceActionsToToast } from "./toastOverlay";
 import { TOAST_ID } from "./injectStyles";
 import { NaranjoAction } from "@/entities/types";
 
@@ -340,6 +340,180 @@ describe("content/toastOverlay", () => {
     test("does nothing when taskId is not found", () => {
       // Should not throw
       expect(() => transitionToastToStreaming("non-existent-task")).not.toThrow();
+    });
+  });
+
+  describe("deferred side-effect actions (Apply / Cancel)", () => {
+    test("showStreamingToast stores data-action when action is provided", () => {
+      showStreamingToast("task-action-stored", NaranjoAction.replaceText);
+
+      const notification = document.querySelector(
+        '[data-task-id="task-action-stored"]',
+      ) as HTMLElement;
+      expect(notification.dataset.action).toBe(NaranjoAction.replaceText);
+    });
+
+    test("showStreamingToast does not set data-action when action is omitted", () => {
+      showStreamingToast("task-no-action");
+
+      const notification = document.querySelector(
+        '[data-task-id="task-no-action"]',
+      ) as HTMLElement;
+      expect(notification.dataset.action).toBeUndefined();
+    });
+
+    test("finalizeToast adds Apply and Cancel buttons when data-action is replaceText", () => {
+      const onApply = jest.fn();
+      showStreamingToast("task-replace-final", NaranjoAction.replaceText);
+      finalizeToast("task-replace-final", "SUCCESS", "replaced content", onApply);
+
+      const applyBtn = document.querySelector('[data-task-id="task-replace-final"] .naranjo-apply-btn');
+      const cancelBtn = document.querySelector('[data-task-id="task-replace-final"] .naranjo-cancel-btn');
+      expect(applyBtn).not.toBeNull();
+      expect(cancelBtn).not.toBeNull();
+    });
+
+    test("finalizeToast does NOT add Apply/Cancel buttons when data-action is alertUser", () => {
+      const onApply = jest.fn();
+      showStreamingToast("task-alert-final", NaranjoAction.alertUser);
+      finalizeToast("task-alert-final", "SUCCESS", "some content", onApply);
+
+      const applyBtn = document.querySelector('[data-task-id="task-alert-final"] .naranjo-apply-btn');
+      expect(applyBtn).toBeNull();
+    });
+
+    test("finalizeToast does NOT add Apply/Cancel buttons when no action is stored", () => {
+      const onApply = jest.fn();
+      showStreamingToast("task-no-action-final");
+      finalizeToast("task-no-action-final", "SUCCESS", "some content", onApply);
+
+      const applyBtn = document.querySelector('[data-task-id="task-no-action-final"] .naranjo-apply-btn');
+      expect(applyBtn).toBeNull();
+    });
+
+    test("Apply button invokes onApply with the stored raw content", () => {
+      const onApply = jest.fn();
+      showStreamingToast("task-apply-click", NaranjoAction.replaceText);
+      finalizeToast("task-apply-click", "SUCCESS", "final text", onApply);
+
+      const applyBtn = document.querySelector('[data-task-id="task-apply-click"] .naranjo-apply-btn') as HTMLButtonElement;
+      applyBtn.click();
+
+      expect(onApply).toHaveBeenCalledWith("final text");
+    });
+
+    test("Apply button reads the latest data-raw-content after a follow-up refinement cycle", () => {
+      const onApply = jest.fn();
+      // Original task streams and finalizes
+      showStreamingToast("task-refine-apply", NaranjoAction.replaceText);
+      finalizeToast("task-refine-apply", "SUCCESS", "first draft", onApply);
+      // Follow-up: transition back to streaming then re-finalize with refined content
+      transitionToastToStreaming("task-refine-apply");
+      finalizeToast("task-refine-apply", "SUCCESS", "refined version", onApply);
+
+      const applyBtn = document.querySelector('[data-task-id="task-refine-apply"] .naranjo-apply-btn') as HTMLButtonElement;
+      applyBtn.click();
+
+      expect(onApply).toHaveBeenCalledWith("refined version");
+    });
+
+    test("Cancel button dismisses toast without calling onApply", () => {
+      const onApply = jest.fn();
+      showStreamingToast("task-cancel-click", NaranjoAction.replaceText);
+      finalizeToast("task-cancel-click", "SUCCESS", "some content", onApply);
+
+      const cancelBtn = document.querySelector('[data-task-id="task-cancel-click"] .naranjo-cancel-btn') as HTMLButtonElement;
+      cancelBtn.click();
+
+      expect(onApply).not.toHaveBeenCalled();
+      const notification = document.querySelector('[data-task-id="task-cancel-click"]') as HTMLElement;
+      expect(notification.classList.contains("fade-out")).toBe(true);
+    });
+
+    test("transitionToastToStreaming removes side-effect actions but preserves data-action", () => {
+      const onApply = jest.fn();
+      showStreamingToast("task-transition-replace", NaranjoAction.replaceText);
+      finalizeToast("task-transition-replace", "SUCCESS", "initial", onApply);
+
+      const notificationBefore = document.querySelector(
+        '[data-task-id="task-transition-replace"]',
+      ) as HTMLElement;
+      expect(notificationBefore.querySelector(".naranjo-side-effect-actions")).not.toBeNull();
+
+      transitionToastToStreaming("task-transition-replace");
+
+      const notification = document.querySelector(
+        '[data-task-id="task-transition-replace"]',
+      ) as HTMLElement;
+      expect(notification.querySelector(".naranjo-side-effect-actions")).toBeNull();
+      expect(notification.dataset.action).toBe(NaranjoAction.replaceText);
+    });
+
+    test("after transition and re-finalize, Apply/Cancel re-appear with updated content", () => {
+      const onApply = jest.fn();
+      showStreamingToast("task-followup-replace", NaranjoAction.replaceText);
+      finalizeToast("task-followup-replace", "SUCCESS", "first version", onApply);
+      transitionToastToStreaming("task-followup-replace");
+      // Simulate follow-up finalization with new content
+      finalizeToast("task-followup-replace", "SUCCESS", "refined version", onApply);
+
+      const applyBtn = document.querySelector(
+        '[data-task-id="task-followup-replace"] .naranjo-apply-btn',
+      ) as HTMLButtonElement;
+      expect(applyBtn).not.toBeNull();
+      applyBtn.click();
+      expect(onApply).toHaveBeenCalledWith("refined version");
+    });
+
+    test("appendReplaceActionsToToast adds Apply/Cancel to an existing non-streaming toast", () => {
+      const onApply = jest.fn();
+      showToast("LLM result", "SUCCESS", "task-oneshot");
+      appendReplaceActionsToToast("task-oneshot", "LLM result", onApply);
+
+      const applyBtn = document.querySelector('[data-task-id="task-oneshot"] .naranjo-apply-btn');
+      const cancelBtn = document.querySelector('[data-task-id="task-oneshot"] .naranjo-cancel-btn');
+      expect(applyBtn).not.toBeNull();
+      expect(cancelBtn).not.toBeNull();
+    });
+
+    test("appendReplaceActionsToToast sets data-action so follow-up finalizations re-add buttons", () => {
+      const onApply = jest.fn();
+      showToast("LLM result", "SUCCESS", "task-oneshot-action");
+      appendReplaceActionsToToast("task-oneshot-action", "LLM result", onApply);
+
+      const notification = document.querySelector(
+        '[data-task-id="task-oneshot-action"]',
+      ) as HTMLElement;
+      expect(notification.dataset.action).toBe(NaranjoAction.replaceText);
+    });
+
+    test("follow-up finalization re-adds Apply/Cancel even when onApply is not passed (uses stored callback)", () => {
+      const onApply = jest.fn();
+      // Original task provides onApply
+      showStreamingToast("task-stored-cb", NaranjoAction.replaceText);
+      finalizeToast("task-stored-cb", "SUCCESS", "first version", onApply);
+      // Simulate follow-up: transition removes buttons
+      transitionToastToStreaming("task-stored-cb");
+      // Follow-up finalization does NOT pass onApply (mimics alertUser follow-up action)
+      finalizeToast("task-stored-cb", "SUCCESS", "refined version");
+
+      const applyBtn = document.querySelector(
+        '[data-task-id="task-stored-cb"] .naranjo-apply-btn',
+      ) as HTMLButtonElement;
+      expect(applyBtn).not.toBeNull();
+      applyBtn.click();
+      expect(onApply).toHaveBeenCalledWith("refined version");
+    });
+
+    test("finalizeToast also appends follow-up area alongside Apply/Cancel for replaceText tasks", () => {
+      const onApply = jest.fn();
+      showStreamingToast("task-both-areas", NaranjoAction.replaceText);
+      finalizeToast("task-both-areas", "SUCCESS", "content", onApply);
+
+      const followUp = document.querySelector('[data-task-id="task-both-areas"] .naranjo-followup');
+      const sideEffectActions = document.querySelector('[data-task-id="task-both-areas"] .naranjo-side-effect-actions');
+      expect(followUp).not.toBeNull();
+      expect(sideEffectActions).not.toBeNull();
     });
   });
 

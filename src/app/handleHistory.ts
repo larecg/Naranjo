@@ -14,11 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import browser from "webextension-polyfill";
 import { NaranjoAction, NaranjoTask, TaskStatus } from "@/entities/types";
 import { sendMessage } from "@/utils/messaging";
 import { t } from "./i18n";
 import { renderMarkdown } from "./markdown";
+import { buildBugReportBody } from "./bugReport";
 
 /**
  * Initializes the history tab by fetching tasks and setting up event listeners.
@@ -172,9 +172,13 @@ async function renderHistory() {
       const reportBtn = tr.querySelector(".report-bug-btn") as HTMLButtonElement;
       reportBtn.onclick = () => {
         const errorMessage = task.errorMessage ?? t("error_unknown");
-        const model = task.modelId ?? "unknown";
-        const version = browser.runtime.getManifest().version;
-        const body = `## What happened?\n\n<!-- Describe the issue -->\n\n## Steps to reproduce\n\n<!-- What were you doing when this happened? -->\n\n---\n<details>\n<summary>Error context (review before submitting — remove sensitive information)</summary>\n\n**Error:** ${errorMessage}\n**Context:** ${task.contextTitle}\n**Model:** ${model}\n**Extension version:** ${version}\n**Date:** ${new Date(task.timestamp).toISOString()}\n**Browser:** ${navigator.userAgent}\n</details>`;
+        const body = buildBugReportBody({
+          errorMessage,
+          extensionVersion: process.env.EXTENSION_VERSION,
+          contextTitle: task.contextTitle,
+          modelId: task.modelId,
+          timestamp: task.timestamp,
+        });
         const params = new URLSearchParams({
           title: `[Bug] ${errorMessage.slice(0, 80)}`,
           body,

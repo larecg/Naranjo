@@ -1182,12 +1182,20 @@
 
   <div id="settings" class="tab-panel">
     <div class="panel-placeholder">
-      <div style="display: flex; align-items: flex-end; gap: 12px; margin-bottom: 24px;">
+      <div id="model-selector-wrapper" style="display: flex; align-items: flex-end; gap: 12px; margin-bottom: 24px;">
         <div style="flex-grow: 1;">
           <label for="naranjo-models" data-i18n="label_select_model">Select model</label>
           <select id="naranjo-models"></select>
         </div>
         <button id="open-provider-settings" class="table-th-button-action">
+          <i class="fa fa-cog"></i> <span data-i18n="btn_provider_settings">Provider Settings</span>
+        </button>
+      </div>
+      <div id="no-models-state" class="empty-state-container hidden" style="margin-bottom: 24px;">
+        <i class="fa fa-puzzle-piece empty-state-icon"></i>
+        <p class="empty-state-text" data-i18n="no_models_desc">No models available. Configure an AI provider to get started.</p>
+        <p class="empty-state-text" data-i18n="no_models_providers">Supported providers: Ollama (local), OpenAI, Google, Anthropic, Mistral, xAI, DeepSeek, and Chrome Built-in AI.</p>
+        <button id="no-models-open-settings" class="table-th-button-action" style="margin-top: 12px;">
           <i class="fa fa-cog"></i> <span data-i18n="btn_provider_settings">Provider Settings</span>
         </button>
       </div>
@@ -1225,6 +1233,7 @@
         <a href="https://github.com/larecg/naranjo" target="_blank" class="btn-github">
           <i class="fa fa-external-link"></i> <span data-i18n="btn_view_repo">View Repository</span>
         </a>
+        <p class="version-text" id="app-version"></p>
       </div>
     </div>
   </div>

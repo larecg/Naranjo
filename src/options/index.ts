@@ -51,6 +51,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Ollama Elements
   const ollamaEnabledInput = document.getElementById("ollama-enabled") as HTMLInputElement;
   const ollamaCloudApiKeyInput = document.getElementById("ollama-cloud-api-key") as HTMLInputElement;
+  const ollamaOriginsHint = document.getElementById("ollama-origins-hint") as HTMLParagraphElement;
   const saveOllamaBtn = document.getElementById("save-ollama-btn") as HTMLButtonElement;
   const statusOllama = document.getElementById("status-ollama") as HTMLDivElement;
 
@@ -154,6 +155,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (ollamaConfig) {
         ollamaEnabledInput.checked = ollamaConfig.enabled;
         ollamaCloudApiKeyInput.value = ollamaConfig.cloudApiKey || "";
+        ollamaOriginsHint.style.display = ollamaConfig.cloudApiKey ? "none" : "";
       }
 
       const googleConfig = await getProviderConfig("google") as GoogleProviderConfig;
@@ -212,6 +214,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       element.classList.remove("success");
     }, 3000);
   }
+
+  // Toggle origins hint based on cloud API key
+  ollamaCloudApiKeyInput.addEventListener("input", () => {
+    ollamaOriginsHint.style.display = ollamaCloudApiKeyInput.value.trim() ? "none" : "";
+  });
 
   // Save Ollama config
   saveOllamaBtn.addEventListener("click", async () => {

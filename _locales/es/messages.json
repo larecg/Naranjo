@@ -276,6 +276,9 @@
   "ollama_cloud_api_key_hint": {
     "message": "Déjalo vacío para usar Ollama local en localhost:11434."
   },
+  "ollama_origins_hint": {
+    "message": "Para permitir que la extensión se comunique con Ollama, establece: export OLLAMA_ORIGINS=\"moz-extension://*,chrome-extension://*\""
+  },
   "google_api_key_hint": {
     "message": "Obtén tu clave API en"
   },
@@ -380,5 +383,14 @@
   },
   "btn_follow_up_submit": {
     "message": "Refinar"
+  },
+  "no_models_desc": {
+    "message": "No hay modelos disponibles. Configura un proveedor de IA para comenzar."
+  },
+  "no_models_providers": {
+    "message": "Proveedores compatibles: Ollama (local y nube), OpenAI, Google, Anthropic, Mistral, xAI, DeepSeek y Chrome Built-in AI."
+  },
+  "btn_apply_replace": {
+    "message": "Aplicar"
   }
 }

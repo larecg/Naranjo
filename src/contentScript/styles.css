@@ -500,3 +500,45 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* ── Side-effect action buttons (Apply / Cancel) inside SUCCESS toasts ────── */
+.naranjo-side-effect-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  justify-content: flex-end;
+}
+
+.naranjo-apply-btn {
+  padding: 5px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  cursor: pointer;
+  background-color: var(--color-success);
+  color: var(--color-white);
+  border: 1px solid var(--color-success);
+  transition: opacity 0.15s ease;
+  white-space: nowrap;
+}
+
+.naranjo-apply-btn:hover {
+  opacity: 0.85;
+}
+
+.naranjo-cancel-btn {
+  padding: 5px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  cursor: pointer;
+  background-color: transparent;
+  color: var(--color-slate);
+  border: 1px solid var(--border-subtle);
+  transition: background-color 0.15s ease;
+  white-space: nowrap;
+}
+
+.naranjo-cancel-btn:hover {
+  background-color: var(--color-sand);
+}
