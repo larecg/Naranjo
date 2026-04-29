@@ -15,7 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import browser from "webextension-polyfill";
-import { ProviderConfig, ProviderType, OllamaProviderConfig, MistralProviderConfig, XAIProviderConfig, DeepSeekProviderConfig } from "@/entities/types";
+import { type ProviderConfig, type ProviderType } from "@/entities/types";
 
 const STORAGE_KEY = "naranjo_provider_configs";
 
@@ -24,7 +24,8 @@ const DEFAULT_CONFIGS: Record<ProviderType, ProviderConfig> = {
     id: "ollama",
     name: "Ollama",
     enabled: true,
-  } as OllamaProviderConfig,
+    useCloud: false,
+  },
   openai: {
     id: "openai",
     name: "OpenAI",
@@ -53,19 +54,19 @@ const DEFAULT_CONFIGS: Record<ProviderType, ProviderConfig> = {
     name: "Mistral AI",
     enabled: false,
     apiKey: "",
-  } as MistralProviderConfig,
+  },
   xai: {
     id: "xai",
     name: "xAI (Grok)",
     enabled: false,
     apiKey: "",
-  } as XAIProviderConfig,
+  },
   deepseek: {
     id: "deepseek",
     name: "DeepSeek",
     enabled: false,
     apiKey: "",
-  } as DeepSeekProviderConfig,
+  },
 };
 
 /**

@@ -18,7 +18,7 @@ import browser from "webextension-polyfill";
 import { debouncedSetupContextMenu as setupContextMenu, initContextMenuListener } from "./contextMenu";
 import { getNaranjoContexts } from "@/dao/NaranjoContextDAO";
 import { enqueueTask } from "./taskQueue";
-import { NaranjoAction, NaranjoContext } from "@/entities/types";
+import { NaranjoAction, type NaranjoContext } from "@/entities/types";
 
 jest.mock("@/dao/NaranjoContextDAO", () => ({
   getNaranjoContexts: jest.fn(),

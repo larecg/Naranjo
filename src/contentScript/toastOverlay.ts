@@ -18,8 +18,9 @@ import { injectStyles, TOAST_ID } from "./injectStyles";
 import { t } from "@/app/i18n";
 import { renderMarkdown } from "@/app/markdown";
 import { buildBugReportBody } from "@/app/bugReport";
-import { ErrorReportContext, NaranjoAction } from "@/entities/types";
+import { type ErrorReportContext, NaranjoAction } from "@/entities/types";
 import { sendMessage } from "@/utils/messaging";
+import { copyToClipboard } from "@/utils/clipboard";
 
 /**
  * @module content/toastOverlay
@@ -109,14 +110,35 @@ export function appendReplaceActionsToToast(
   const container = document.getElementById(TOAST_ID);
   if (!container) return;
 
-  const notification = container.querySelector(
-    `.naranjo-notification[data-task-id="${taskId}"]`,
-  ) as HTMLElement | null;
-  if (!notification) return;
+  const notification = container.querySelector(`.naranjo-notification[data-task-id="${taskId}"]`);
+  if (!(notification instanceof HTMLElement)) return;
 
   // Mark the action so finalizeToast re-adds the buttons after follow-ups.
   notification.dataset.action = NaranjoAction.replaceText;
   appendSideEffectActions(notification, rawContent, onApply);
+}
+
+/**
+ * Appends a copy-response button to a SUCCESS toast's top row. The button
+ * reads the latest raw (unrendered) content from `data-raw-content` so that
+ * post-refinement updates are reflected automatically.
+ */
+function appendCopyButton(notification: HTMLElement): void {
+  if (notification.querySelector(".naranjo-copy-btn")) return;
+  const topRow = notification.querySelector(".naranjo-top-row");
+  const closeBtn = notification.querySelector(".naranjo-close-btn");
+  if (!topRow) return;
+
+  const copyBtn = document.createElement("button");
+  copyBtn.className = "naranjo-copy-btn";
+  copyBtn.title = t("btn_copy_response");
+  copyBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
+  copyBtn.onclick = (e) => {
+    e.stopPropagation();
+    void copyToClipboard(notification.dataset.rawContent ?? "");
+  };
+
+  topRow.insertBefore(copyBtn, closeBtn);
 }
 
 /**
@@ -129,10 +151,10 @@ export function appendReplaceActionsToToast(
 function appendFollowUpArea(notification: HTMLElement, taskId: string): void {
   const existing = notification.querySelector(".naranjo-followup");
   if (existing) {
-    const input = existing.querySelector("input") as HTMLInputElement | null;
-    const button = existing.querySelector("button") as HTMLButtonElement | null;
-    if (input) { input.disabled = false; input.value = ""; }
-    if (button) button.disabled = false;
+    const input = existing.querySelector("input");
+    const button = existing.querySelector("button");
+    if (input instanceof HTMLInputElement) { input.disabled = false; input.value = ""; }
+    if (button instanceof HTMLButtonElement) button.disabled = false;
     return;
   }
 
@@ -154,7 +176,7 @@ function appendFollowUpArea(notification: HTMLElement, taskId: string): void {
     const currentContent = messageEl?.textContent ?? "";
     input.disabled = true;
     button.disabled = true;
-    sendMessage({
+    void sendMessage({
       action: NaranjoAction.executeFollowUp,
       payload: { taskId, followUpQuestion, currentContent },
     });
@@ -187,10 +209,8 @@ export function transitionToastToStreaming(taskId: string): void {
   const container = document.getElementById(TOAST_ID);
   if (!container) return;
 
-  const notification = container.querySelector(
-    `.naranjo-notification[data-task-id="${taskId}"]`,
-  ) as HTMLElement | null;
-  if (!notification) return;
+  const notification = container.querySelector(`.naranjo-notification[data-task-id="${taskId}"]`);
+  if (!(notification instanceof HTMLElement)) return;
 
   notification.className = "naranjo-notification processing";
   notification.dataset.type = "PROCESSING";
@@ -218,6 +238,9 @@ export function transitionToastToStreaming(taskId: string): void {
   // data-action is intentionally preserved so finalizeToast knows to re-add them.
   const sideEffectActionsEl = notification.querySelector(".naranjo-side-effect-actions");
   if (sideEffectActionsEl) sideEffectActionsEl.remove();
+
+  const copyBtnEl = notification.querySelector(".naranjo-copy-btn");
+  if (copyBtnEl) copyBtnEl.remove();
 }
 
 /**
@@ -327,8 +350,10 @@ export function showToast(content: string, type: string, taskId?: string, errorC
 
   container.appendChild(notification);
 
-  if (type === "SUCCESS" && taskId) {
-    appendFollowUpArea(notification, taskId);
+  if (type === "SUCCESS") {
+    notification.dataset.rawContent = content;
+    appendCopyButton(notification);
+    if (taskId) appendFollowUpArea(notification, taskId);
   }
 
   if (type !== "SUCCESS") {
@@ -401,13 +426,11 @@ export function updateToastContent(taskId: string, content: string): void {
   const container = document.getElementById(TOAST_ID);
   if (!container) return;
 
-  const notification = container.querySelector(
-    `.naranjo-notification[data-task-id="${taskId}"][data-streaming="true"]`,
-  );
-  if (!notification) return;
+  const notification = container.querySelector(`.naranjo-notification[data-task-id="${taskId}"][data-streaming="true"]`);
+  if (!(notification instanceof HTMLElement)) return;
 
-  const messageEl = notification.querySelector(".naranjo-message") as HTMLElement | null;
-  if (messageEl) {
+  const messageEl = notification.querySelector(".naranjo-message");
+  if (messageEl instanceof HTMLElement) {
     messageEl.innerHTML = renderMarkdown(content);
     messageEl.scrollTop = messageEl.scrollHeight;
   }
@@ -435,10 +458,8 @@ export function finalizeToast(
   const container = document.getElementById(TOAST_ID);
   if (!container) return;
 
-  const notification = container.querySelector(
-    `.naranjo-notification[data-task-id="${taskId}"][data-streaming="true"]`,
-  ) as HTMLElement | null;
-  if (!notification) return;
+  const notification = container.querySelector(`.naranjo-notification[data-task-id="${taskId}"][data-streaming="true"]`);
+  if (!(notification instanceof HTMLElement)) return;
 
   notification.className = `naranjo-notification ${type.toLowerCase()}`;
   notification.dataset.type = type;
@@ -453,6 +474,8 @@ export function finalizeToast(
           <polyline points="22 4 12 14.01 9 11.01"></polyline>
         </svg>`;
     }
+    if (rawContent !== undefined) notification.dataset.rawContent = rawContent;
+    appendCopyButton(notification);
     appendFollowUpArea(notification, taskId);
     if (rawContent !== undefined && notification.dataset.action === NaranjoAction.replaceText) {
       const callback = onApply ?? sideEffectCallbacks.get(taskId);

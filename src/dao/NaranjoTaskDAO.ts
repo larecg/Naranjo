@@ -20,33 +20,28 @@
  *
  * @module NaranjoTaskDAO
  */
-import { NaranjoTask, TaskStatus } from "@/entities/types";
+import { type NaranjoTask, TaskStatus } from "@/entities/types";
 
 const dbName = "naranjoTasks";
 const dbVersion = 1;
 const storeName = "Tasks";
-let db: Promise<IDBDatabase>;
+let db: Promise<IDBDatabase> | null = null;
 
 /**
  * Get the IndexedDB database instance, creating it if necessary.
  * @returns The IDBDatabase instance.
  */
 async function getIDBDatabase(): Promise<IDBDatabase> {
-  if (!db) {
+  if (db === null) {
     const openRequest = indexedDB.open(dbName, dbVersion);
     db = new Promise((resolve, reject) => {
-      // @ts-expect-error
-      openRequest.onsuccess = (e) => resolve(e.target.result);
-      // @ts-expect-error
-      openRequest.onblocked = (e) => reject(e.target.error);
-      // @ts-expect-error
-      openRequest.onerror = (e) => reject(e.target.error);
+      openRequest.onsuccess = (e) => resolve((e.target as IDBOpenDBRequest).result);
+      openRequest.onblocked = () => reject(openRequest.error ?? new Error("IDB blocked"));
+      openRequest.onerror = () => reject(openRequest.error ?? new Error("IDB error"));
       openRequest.onupgradeneeded = (e) => {
-        console.debug("Upgrading task store");
-        // @ts-expect-error
-        const db = e.target.result as unknown as IDBDatabase;
-        // @ts-expect-error
-        db.onerror = (e) => reject(e.target.error);
+        console.warn("Upgrading task store");
+        const db = (e.target as IDBOpenDBRequest).result;
+        db.onerror = () => reject(openRequest.error ?? new Error("IDB upgrade error"));
 
         // Create an objectStore for tasks
         if (!db.objectStoreNames.contains(storeName)) {
@@ -79,10 +74,8 @@ async function getObjectStore(
  */
 async function promisifyRequest<T>(request: IDBRequest<T>): Promise<T> {
   return new Promise<T>((resolve, reject) => {
-    // @ts-expect-error
-    request.onsuccess = (e) => resolve(e.target.result);
-    // @ts-expect-error
-    request.onerror = (e) => reject(e.target.error);
+    request.onsuccess = (e) => resolve((e.target as IDBRequest<T>).result);
+    request.onerror = () => reject(request.error ?? new Error("IDB request failed"));
   });
 }
 
@@ -110,8 +103,57 @@ export async function getAllTasks(): Promise<NaranjoTask[]> {
   const index = store.index("timestamp");
   // IDBCursorDirection "prev" sorts descending
   const request = index.getAll(null);
-  const tasks = await promisifyRequest(request);
+  const tasks = await promisifyRequest(request as IDBRequest<NaranjoTask[]>);
   return tasks.sort((a, b) => b.timestamp - a.timestamp);
+}
+
+/**
+ * Retrieves a page of tasks sorted by timestamp (newest first), without
+ * loading the full history into memory. Uses an IndexedDB cursor in
+ * descending order so only the requested slice is materialized.
+ */
+export async function getTasksPage(
+  offset: number,
+  limit: number,
+): Promise<{ tasks: NaranjoTask[]; total: number }> {
+  const safeOffset = Math.max(0, Math.floor(offset));
+  const safeLimit = Math.max(0, Math.floor(limit));
+
+  const store = await getObjectStore();
+  const index = store.index("timestamp");
+
+  const total = await promisifyRequest(index.count());
+  if (safeLimit === 0 || safeOffset >= total) {
+    return { tasks: [], total };
+  }
+
+  const tasks: NaranjoTask[] = [];
+  return new Promise<{ tasks: NaranjoTask[]; total: number }>(
+    (resolve, reject) => {
+      const cursorRequest = index.openCursor(null, "prev");
+      let advanced = safeOffset === 0;
+
+      cursorRequest.onsuccess = (event) => {
+        const cursor = (event.target as IDBRequest<IDBCursorWithValue | null>).result;
+        if (!cursor) {
+          resolve({ tasks, total });
+          return;
+        }
+        if (!advanced) {
+          advanced = true;
+          cursor.advance(safeOffset);
+          return;
+        }
+        tasks.push(cursor.value as NaranjoTask);
+        if (tasks.length >= safeLimit) {
+          resolve({ tasks, total });
+          return;
+        }
+        cursor.continue();
+      };
+      cursorRequest.onerror = () => reject(cursorRequest.error ?? new Error("IDB cursor error"));
+    },
+  );
 }
 
 /**
@@ -121,7 +163,7 @@ export async function getPendingTasks(): Promise<NaranjoTask[]> {
   const store = await getObjectStore();
   const index = store.index("status");
   const request = index.getAll(TaskStatus.PENDING);
-  return promisifyRequest(request);
+  return promisifyRequest(request as IDBRequest<NaranjoTask[]>);
 }
 
 /**
@@ -147,5 +189,5 @@ export async function getTaskById(
   id: string,
 ): Promise<NaranjoTask | undefined> {
   const store = await getObjectStore();
-  return promisifyRequest(store.get(id));
+  return promisifyRequest(store.get(id) as IDBRequest<NaranjoTask | undefined>);
 }

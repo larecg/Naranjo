@@ -68,6 +68,5 @@ const mockBrowser = {
   },
 };
 
-// @ts-expect-error
-global.browser = mockBrowser;
+(global as unknown as { browser: typeof mockBrowser }).browser = mockBrowser;
 jest.mock("webextension-polyfill", () => mockBrowser);

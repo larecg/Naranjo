@@ -25,7 +25,7 @@ import browser from "webextension-polyfill";
  * @param retries - Number of attempts before throwing (default: 3).
  * @param delayMs - Delay between attempts in milliseconds (default: 200).
  */
-export async function sendMessage(message: object, retries = 3, delayMs = 200): Promise<any> {
+export async function sendMessage<T = unknown>(message: object, retries = 3, delayMs = 200): Promise<T> {
   for (let i = 0; i < retries; i++) {
     try {
       return await browser.runtime.sendMessage(message);
@@ -37,4 +37,5 @@ export async function sendMessage(message: object, retries = 3, delayMs = 200): 
       }
     }
   }
+  throw new Error("sendMessage exhausted all retries");
 }

@@ -40,21 +40,25 @@ async function initialize() {
   await loadState();
 
   // Start queue processing if there were pending tasks from previous session
-  processQueue();
+  void processQueue();
+}
+
+async function onInstalled() {
+  await setupContextMenu();
+
+  // Initial model loading
+  await getLocalLLModels().catch(async (error: unknown) => {
+    console.error("Error loading models", { error });
+    await sendErrorMessage("Error loading models");
+  });
 }
 
 /**
  * Handle one-time setup on installation or update.
  */
-browser.runtime.onInstalled.addListener(async () => {
-  await setupContextMenu();
-  
-  // Initial model loading
-  getLocalLLModels().catch(async (error) => {
-    console.error("Error loading models", { error });
-    await sendErrorMessage("Error loading models");
-  });
+browser.runtime.onInstalled.addListener(() => {
+  void onInstalled();
 });
 
 // Initialize the service worker
-initialize();
+void initialize();

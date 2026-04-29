@@ -15,7 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { getProviderConfig } from "@/dao/ProviderConfigDAO";
-import { GoogleProviderConfig, ConversationTurn } from "@/entities/types";
+import { type GoogleProviderConfig, type ConversationTurn } from "@/entities/types";
 
 /**
  * Provides functions to interact with the Google Gemini service.
@@ -53,15 +53,15 @@ export async function getListOfModels(): Promise<string[]> {
       throw new Error(response.statusText);
     }
 
-    const result = await response.json();
+    const result = await response.json() as { models?: { supportedGenerationMethods: string[]; name: string }[] };
     if (!result.models || !Array.isArray(result.models)) {
       throw new Error("Invalid response format");
     }
 
     // Filter for models that support generateContent
     return result.models
-      .filter((model: any) => model.supportedGenerationMethods.includes("generateContent"))
-      .map((model: any) => model.name.replace("models/", ""));
+      .filter((model) => model.supportedGenerationMethods.includes("generateContent"))
+      .map((model) => model.name.replace("models/", ""));
   } catch (error) {
     console.error("Error fetching Gemini models", error);
     // Fallback to common models if fetch fails but API key exists
@@ -121,7 +121,7 @@ export async function sendPrompt(params: {
       );
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
+        const errorData = await response.json().catch(() => ({})) as { error?: { message?: string } };
         throw new Error(errorData.error?.message || response.statusText);
       }
 
@@ -140,11 +140,11 @@ export async function sendPrompt(params: {
         for (const line of lines) {
           if (!line.startsWith("data: ")) continue;
           try {
-            const data = JSON.parse(line.slice(6));
+            const data = JSON.parse(line.slice(6)) as { candidates?: [{ content?: { parts?: [{ text?: string }] } }] };
             const chunk = data.candidates?.[0]?.content?.parts?.[0]?.text;
             if (chunk) {
               fullContent += chunk;
-              onChunk!(chunk);
+              onChunk(chunk);
             }
           } catch {}
         }
@@ -162,12 +162,12 @@ export async function sendPrompt(params: {
     );
 
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = await response.json() as { error?: { message?: string } };
       throw new Error(errorData.error?.message || response.statusText);
     }
 
-    const result = await response.json();
-    if (!result.candidates || !result.candidates[0]?.content?.parts[0]?.text) {
+    const result = await response.json() as { candidates?: [{ content?: { parts?: [{ text?: string }] } }] };
+    if (!result.candidates || !result.candidates[0]?.content?.parts?.[0]?.text) {
       throw new Error("Invalid response format from Gemini API");
     }
 

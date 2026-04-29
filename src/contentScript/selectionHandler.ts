@@ -42,7 +42,7 @@ export function updateDOMSelectionWithNaranjo(replaceWith: string): void {
       // execCommand is a legacy API and may fail in some environments
       const wasExecutedSuccessfully = document.execCommand("insertText", false, replaceWith);
       if (wasExecutedSuccessfully) return;
-    } catch (error) {}
+    } catch {}
 
     const canUsePreciseSelection = isSelectionAPISupported(activeElement);
     if (canUsePreciseSelection) {
@@ -73,7 +73,7 @@ export function updateDOMSelectionWithNaranjo(replaceWith: string): void {
     try {
       const wasExecutedSuccessfully = document.execCommand("insertText", false, replaceWith);
       if (wasExecutedSuccessfully) return;
-    } catch (error) {}
+    } catch {}
 
     const range = domSelection.getRangeAt(0);
     range.deleteContents();

@@ -15,7 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import browser from "webextension-polyfill";
-import { NaranjoAction, ResponseAPIMessage, StreamPortMessage } from "@/entities/types";
+import { NaranjoAction, type ResponseAPIMessage, type StreamPortMessage } from "@/entities/types";
 import { sendMessage } from "@/utils/messaging";
 import {
   showToast,
@@ -111,7 +111,7 @@ browser.runtime.onMessage.addListener((message, _, sendResponse) => {
 
     case NaranjoAction.dismissAlert:
       dismissToast({
-        type: type as string,
+        type: type,
         taskId: payload?.taskId,
       });
       break;
@@ -210,5 +210,3 @@ browser.runtime.onConnect.addListener((port) => {
     }
   });
 });
-
-console.log("Naranjo Content Script initialized");

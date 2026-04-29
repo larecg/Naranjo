@@ -56,6 +56,11 @@ export enum NaranjoAction {
   getTaskHistory = "getTaskHistory",
 
   /**
+   * Retrieves a page of executed tasks for paginated rendering
+   * */
+  getTaskHistoryPage = "getTaskHistoryPage",
+
+  /**
    * Deletes a specific task from history
    * */
   deleteTask = "deleteTask",
@@ -187,6 +192,7 @@ export interface BaseProviderConfig {
 
 export interface OllamaProviderConfig extends BaseProviderConfig {
   id: "ollama";
+  useCloud?: boolean;
   cloudApiKey?: string;
 }
 
@@ -327,6 +333,10 @@ export type SetDefaultContextAPIMessage = {
   payload: string;
 };
 
+export type GetDefaultContextIdAPIMessage = {
+  action: "getDefaultContextId";
+};
+
 /**
  * Message to execute the user's default context.
  * Typically sent from the content script after a 'requestSelection' call,
@@ -342,6 +352,21 @@ export type ExecuteDefaultContextAPIMessage = {
 
 export type GetTaskHistoryAPIMessage = {
   action: NaranjoAction.getTaskHistory;
+};
+
+export type GetTaskHistoryPageAPIMessage = {
+  action: NaranjoAction.getTaskHistoryPage;
+  payload: {
+    /** Zero-based index of the first task to return */
+    offset: number;
+    /** Maximum number of tasks to return in the page */
+    limit: number;
+  };
+};
+
+export type TaskHistoryPage = {
+  tasks: NaranjoTask[];
+  total: number;
 };
 
 export type DeleteTaskAPIMessage = {
@@ -405,8 +430,10 @@ export type APIMessages =
   | ExecuteContextAPIMessage
   | RequestSelectionAPIMessage
   | SetDefaultContextAPIMessage
+  | GetDefaultContextIdAPIMessage
   | ExecuteDefaultContextAPIMessage
   | GetTaskHistoryAPIMessage
+  | GetTaskHistoryPageAPIMessage
   | DeleteTaskAPIMessage
   | ClearTaskHistoryAPIMessage
   | ReloadProviderConfigsAPIMessage

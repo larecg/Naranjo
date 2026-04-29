@@ -33,6 +33,11 @@ import { getListOfModels as getChromeBuiltinModels } from "@/services/chromeBuil
 import { getListOfModels as getMistralModels } from "@/services/mistralService";
 import { getListOfModels as getXAIModels } from "@/services/xaiService";
 import { getListOfModels as getDeepSeekModels } from "@/services/deepseekService";
+import { getNaranjoContexts } from "@/dao/NaranjoContextDAO";
+
+jest.mock("@/dao/NaranjoContextDAO", () => ({
+  getNaranjoContexts: jest.fn(),
+}));
 
 jest.mock("@/services/ollamaService", () => ({
   getListOfModels: jest.fn(),
@@ -193,6 +198,19 @@ describe("background/state", () => {
       expect(await getDefaultContextId()).toBe("ctx-123");
       expect(browser.storage.local.set).toHaveBeenCalledWith({
         defaultContextId: "ctx-123",
+      });
+    });
+
+    test("it should automatically select a default action if the user has not made a choice yet", async () => {
+      (getNaranjoContexts as jest.Mock).mockResolvedValue([
+        { id: "auto-ctx", title: "Auto" }
+      ]);
+
+      const result = await getDefaultContextId();
+
+      expect(result).toBe("auto-ctx");
+      expect(browser.storage.local.set).toHaveBeenCalledWith({
+        defaultContextId: "auto-ctx",
       });
     });
   });

@@ -20,7 +20,7 @@
  *
  * @module NaranjoContextDAO
  */
-import { NaranjoAction, NaranjoContext } from "@/entities/types";
+import { NaranjoAction, type NaranjoContext } from "@/entities/types";
 import { t } from "@/app/i18n";
 
 function getDefaultContextEntries(): NaranjoContext[] {
@@ -72,9 +72,8 @@ function getDefaultContextEntries(): NaranjoContext[] {
 export async function getNaranjoContextById(
   id: string,
 ): Promise<NaranjoContext> {
-  console.debug("Retrieving the context by id");
   const objectStore = await getObjectStore();
-  return promisifyRequest(objectStore.get(id));
+  return promisifyRequest(objectStore.get(id) as IDBRequest<NaranjoContext>);
 }
 
 /**
@@ -82,9 +81,8 @@ export async function getNaranjoContextById(
  * @returns An array of all NaranjoContext objects.
  */
 export async function getNaranjoContexts(): Promise<NaranjoContext[]> {
-  console.debug("Retrieving all the contexts");
   const objectStore = await getObjectStore();
-  return promisifyRequest(objectStore.getAll());
+  return promisifyRequest(objectStore.getAll() as IDBRequest<NaranjoContext[]>);
 }
 
 /**
@@ -94,7 +92,6 @@ export async function getNaranjoContexts(): Promise<NaranjoContext[]> {
 export async function addNaranjoContext(
   naranjoContext: NaranjoContext,
 ): Promise<void> {
-  console.debug("Adding context", { naranjoContext });
   const objectStore = await getObjectStore("readwrite");
   await promisifyRequest(objectStore.add(naranjoContext));
 }
@@ -104,7 +101,6 @@ export async function addNaranjoContext(
  * @param id - Identifier of the Naranjo context to delete.
  */
 export async function deleteNaranjoContext(id: string): Promise<void> {
-  console.debug("Deleting context", { id });
   const objectStore = await getObjectStore("readwrite");
   await promisifyRequest(objectStore.delete(id));
 }
@@ -116,7 +112,6 @@ export async function deleteNaranjoContext(id: string): Promise<void> {
 export async function updateNaranjoContext(
   naranjoContext: NaranjoContext,
 ): Promise<void> {
-  console.debug("Updating context", { naranjoContext });
   const objectStore = await getObjectStore("readwrite");
   await promisifyRequest(objectStore.put(naranjoContext));
 }
@@ -126,7 +121,7 @@ export async function updateNaranjoContext(
 const dbVersion = 1;
 const dbName = "naranjoContexts";
 const storeName = "Contexts";
-let db: Promise<IDBDatabase>;
+let db: Promise<IDBDatabase> | null = null;
 
 /**
  * Get the IndexedDB object store for contexts.
@@ -145,21 +140,16 @@ async function getObjectStore(
  * @returns The IDBDatabase instance.
  */
 async function getIDBDatabase(): Promise<IDBDatabase> {
-  if (!db) {
+  if (db === null) {
     const openRequest = indexedDB.open(dbName, dbVersion);
     db = new Promise((resolve, reject) => {
-      // @ts-expect-error
-      openRequest.onsuccess = (e) => resolve(e.target.result);
-      // @ts-expect-error
-      openRequest.onblocked = (e) => reject(e.target.error);
-      // @ts-expect-error
-      openRequest.onerror = (e) => reject(e.target.error);
+      openRequest.onsuccess = (e) => resolve((e.target as IDBOpenDBRequest).result);
+      openRequest.onblocked = () => reject(openRequest.error ?? new Error("IDB blocked"));
+      openRequest.onerror = () => reject(openRequest.error ?? new Error("IDB error"));
       openRequest.onupgradeneeded = (e) => {
-        console.debug("Upgrading store");
-        // @ts-expect-error
-        const db = e.target.result as unknown as IDBDatabase;
-        // @ts-expect-error
-        db.onerror = (e) => reject(e.target.error);
+        console.warn("Upgrading store");
+        const db = (e.target as IDBOpenDBRequest).result;
+        db.onerror = () => reject(openRequest.error ?? new Error("IDB upgrade error"));
         // Create an objectStore for this database
         const objectStore = db.createObjectStore(storeName, { keyPath: "id" });
         objectStore.createIndex("title", "title", {
@@ -187,9 +177,7 @@ async function getIDBDatabase(): Promise<IDBDatabase> {
  */
 async function promisifyRequest<T>(request: IDBRequest<T>): Promise<T> {
   return new Promise<T>((resolve, reject) => {
-    // @ts-expect-error
-    request.onsuccess = (e) => resolve(e.target.result);
-    // @ts-expect-error
-    request.onerror = (e) => reject(e.target.error);
+    request.onsuccess = (e) => resolve((e.target as IDBRequest<T>).result);
+    request.onerror = () => reject(request.error ?? new Error("IDB request failed"));
   });
 }

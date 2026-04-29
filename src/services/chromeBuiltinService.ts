@@ -15,11 +15,24 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { getProviderConfig } from "@/dao/ProviderConfigDAO";
-import { ChromeBuiltinProviderConfig, ConversationTurn } from "@/entities/types";
+import { type ChromeBuiltinProviderConfig, type ConversationTurn } from "@/entities/types";
+
+export interface ChromeAISession {
+  promptStreaming(input: string): ReadableStream<string>;
+  prompt(input: string): Promise<string>;
+  destroy(): void;
+}
+
+export interface ChromeAI {
+  languageModel: {
+    capabilities(): Promise<{ available: string }>;
+    create(options: { systemPrompt: string; initialPrompts?: ConversationTurn[] }): Promise<ChromeAISession>;
+  };
+}
 
 /**
  * Provides functions to interact with the Chrome Built-in AI (Gemini Nano).
- * 
+ *
  * @module chromeBuiltinService
  */
 
@@ -33,27 +46,16 @@ async function isEnabled(): Promise<boolean> {
   }
 }
 
-function getAIObject(): any {
-  // @ts-ignore
-  if (typeof chrome !== 'undefined' && chrome.ai && chrome.ai.languageModel) {
-    // @ts-ignore
-    return chrome.ai;
+type ChromeWithAI = { ai?: ChromeAI; aiOriginTrial?: ChromeAI };
+type GlobalWithAI = { chrome?: ChromeWithAI; ai?: ChromeAI };
+
+function getAIObject(): ChromeAI | null {
+  const g = globalThis as unknown as GlobalWithAI;
+  if (g.chrome) {
+    if (g.chrome.ai?.languageModel) return g.chrome.ai;
+    if (g.chrome.aiOriginTrial) return g.chrome.aiOriginTrial;
   }
-  // @ts-ignore
-  if (typeof chrome !== 'undefined' && chrome.aiOriginTrial) {
-    // @ts-ignore
-    return chrome.aiOriginTrial;
-  }
-  // @ts-ignore
-  if (typeof window !== 'undefined' && window.ai) {
-    // @ts-ignore
-    return window.ai;
-  }
-  // @ts-ignore
-  if (typeof self !== 'undefined' && (self as any).ai) {
-    // @ts-ignore
-    return (self as any).ai;
-  }
+  if (g.ai) return g.ai;
   return null;
 }
 
@@ -104,7 +106,7 @@ export async function sendPrompt(params: {
     throw new Error("Chrome Built-in AI (Prompt API) is not supported in this browser environment.");
   }
 
-  let session: any = null;
+  let session: ChromeAISession | null = null;
   try {
     session = await ai.languageModel.create({
       systemPrompt: prompt,

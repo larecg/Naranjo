@@ -140,6 +140,12 @@
   "badge_default": {
     "message": "Default"
   },
+  "tooltip_set_default": {
+    "message": "Set as default action"
+  },
+  "tooltip_is_default": {
+    "message": "Current default action"
+  },
   "set_as_default": {
     "message": "\"$CONTEXT_NAME$\" set as default",
     "placeholders": {
@@ -234,6 +240,12 @@
   "options_providers_heading": {
     "message": "Providers"
   },
+  "options_changelog_sidebar": {
+    "message": "Changelog"
+  },
+  "options_changelog_title": {
+    "message": "Changelog"
+  },
   "options_configuration_heading": {
     "message": "Configuration"
   },
@@ -270,11 +282,23 @@
   "label_model_status": {
     "message": "Model Status"
   },
-  "ollama_cloud_api_key_label": {
+  "ollama_mode_label": {
+    "message": "Mode"
+  },
+  "ollama_mode_local": {
+    "message": "Local"
+  },
+  "ollama_mode_cloud": {
+    "message": "Cloud"
+  },
+  "ollama_cloud_api_key_label_optional": {
     "message": "Ollama Cloud API Key (optional)"
   },
-  "ollama_cloud_api_key_hint": {
-    "message": "Leave empty to use local Ollama at localhost:11434."
+  "ollama_cloud_api_key_label_required": {
+    "message": "Ollama Cloud API Key (required)"
+  },
+  "msg_ollama_cloud_key_required": {
+    "message": "An API key is required for Ollama Cloud mode."
   },
   "ollama_origins_hint": {
     "message": "To allow the extension to communicate with Ollama, set: export OLLAMA_ORIGINS=\"moz-extension://*,chrome-extension://*\""
@@ -348,6 +372,9 @@
   "btn_view_answer": {
     "message": "View answer"
   },
+  "btn_copy_response": {
+    "message": "Copy response"
+  },
   "model_global_default": {
     "message": "— Global default —"
   },
@@ -392,5 +419,22 @@
   },
   "btn_apply_replace": {
     "message": "Apply"
+  },
+  "pagination_prev": {
+    "message": "Previous page"
+  },
+  "pagination_next": {
+    "message": "Next page"
+  },
+  "pagination_page_info": {
+    "message": "Page $CURRENT$ of $TOTAL$",
+    "placeholders": {
+      "current": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
   }
 }

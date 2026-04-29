@@ -23,7 +23,7 @@ import { getListOfModels as getChromeBuiltinModels } from "@/services/chromeBuil
 import { getListOfModels as getMistralModels } from "@/services/mistralService";
 import { getListOfModels as getXAIModels } from "@/services/xaiService";
 import { getListOfModels as getDeepSeekModels } from "@/services/deepseekService";
-import { LLMModel, ProviderType } from "@/entities/types";
+import { type LLMModel } from "@/entities/types";
 
 /**
  * @module background/state
@@ -83,13 +83,31 @@ export async function setSelectedModel(model: string | null): Promise<void> {
 
 /**
  * Retrieves the default context ID.
- * 
+ * If no default context is set, it attempts to load state first.
+ * If it's still null, it tries to automatically select the first available context.
+ *
  * @returns {Promise<string | null>} The ID of the default context.
  */
 export async function getDefaultContextId(): Promise<string | null> {
   if (defaultContextId === null) {
     await loadState();
   }
+
+  if (defaultContextId === null) {
+    // Dynamically import to avoid potential circular dependencies and load on demand
+    const { getNaranjoContexts } = await import("@/dao/NaranjoContextDAO");
+    try {
+      const contexts = await getNaranjoContexts();
+      if (contexts.length > 0) {
+        defaultContextId = contexts[0].id;
+        // Persist the automatically selected default
+        await browser.storage.local.set({ defaultContextId });
+      }
+    } catch (error) {
+      console.warn("Failed to automatically select a default context", error);
+    }
+  }
+
   return defaultContextId;
 }
 

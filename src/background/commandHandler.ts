@@ -15,7 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import browser from "webextension-polyfill";
-import { APIMessages, NaranjoAction, ConversationTurn } from "@/entities/types";
+import { type APIMessages, NaranjoAction, type ConversationTurn } from "@/entities/types";
 import { t } from "@/app/i18n";
 import {
   getNaranjoContexts,
@@ -26,6 +26,7 @@ import {
 } from "@/dao/NaranjoContextDAO";
 import {
   getAllTasks,
+  getTasksPage,
   deleteTask,
   clearTaskHistory,
   getTaskById,
@@ -96,6 +97,9 @@ export function initMessageListener(): void {
         await setSelectedModel(actionMessage.payload || null);
         break;
 
+      case "getDefaultContextId":
+        return await getDefaultContextId();
+
       case "getLocalLLModels":
         try {
           return await getLocalLLModels();
@@ -126,6 +130,15 @@ export function initMessageListener(): void {
         } catch (error) {
           await handleError("Error loading task history", error as Error);
           return [];
+        }
+
+      case NaranjoAction.getTaskHistoryPage:
+        try {
+          const { offset, limit } = actionMessage.payload;
+          return await getTasksPage(offset, limit);
+        } catch (error) {
+          await handleError("Error loading task history page", error as Error);
+          return { tasks: [], total: 0 };
         }
 
       case NaranjoAction.deleteTask:
@@ -233,7 +246,13 @@ export function initMessageListener(): void {
         }
 
         const defaultId = await getDefaultContextId();
-        if (!defaultId) break;
+        if (!defaultId) {
+          await sendErrorMessage(
+            "No default context set. Please use the Quick Menu to select one first.",
+            tabId,
+          );
+          break;
+        }
 
         try {
           const context = await getNaranjoContextById(defaultId);
@@ -254,19 +273,15 @@ export function initMessageListener(): void {
       }
 
       default:
-        console.warn("Unknown message action:", (actionMessage as any).action);
+        console.warn("Unknown message action:", (actionMessage as { action: unknown }).action);
         break;
     }
     return true;
   });
 }
 
-/**
- * Initializes keyboard command listeners.
- */
-export function initCommandListener(): void {
-  browser.commands.onCommand.addListener(async (command) => {
-    const activeTabs = await browser.tabs.query({
+export async function handleCommand(command: string): Promise<void> {
+  const activeTabs = await browser.tabs.query({
       active: true,
       currentWindow: true,
     });
@@ -323,5 +338,13 @@ export function initCommandListener(): void {
         );
       }
     }
+}
+
+/**
+ * Initializes keyboard command listeners.
+ */
+export function initCommandListener(): void {
+  browser.commands.onCommand.addListener((command) => {
+    void handleCommand(command);
   });
 }

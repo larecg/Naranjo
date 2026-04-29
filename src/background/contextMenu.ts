@@ -44,20 +44,20 @@ export async function setupContextMenu(): Promise<void> {
     for (const naranjoContext of naranjoContexts) {
       const { id, title } = naranjoContext;
 
-      await browser.contextMenus.create({
+      browser.contextMenus.create({
         id,
         title,
         contexts: ["selection"],
       });
     }
 
-    await browser.contextMenus.create({
+    browser.contextMenus.create({
       id: "naranjo-separator",
       type: "separator",
       contexts: ["selection"],
     });
 
-    await browser.contextMenus.create({
+    browser.contextMenus.create({
       id: CUSTOM_PROMPT_MENU_ID,
       title: "Custom Prompt...",
       contexts: ["selection"],
@@ -81,13 +81,15 @@ export async function debouncedSetupContextMenu(): Promise<void> {
   return new Promise((resolve) => {
     resolvers.push(resolve);
     
-    setupTimer = setTimeout(async () => {
-      await setupContextMenu();
-      setupTimer = null;
-      
-      const currentResolvers = resolvers;
-      resolvers = [];
-      currentResolvers.forEach(res => res());
+    setupTimer = setTimeout(() => {
+      void (async () => {
+        await setupContextMenu();
+        setupTimer = null;
+
+        const currentResolvers = resolvers;
+        resolvers = [];
+        currentResolvers.forEach((res) => res());
+      })();
     }, 300);
   });
 }
@@ -95,33 +97,40 @@ export async function debouncedSetupContextMenu(): Promise<void> {
 /**
  * Initializes the context menu click listener.
  */
+async function handleContextMenuClick(
+  info: browser.Menus.OnClickData,
+  tab: browser.Tabs.Tab | undefined,
+): Promise<void> {
+  const tabId = tab?.id;
+  const input = info.selectionText;
+
+  if (!tabId || !input) return;
+
+  if (info.menuItemId === CUSTOM_PROMPT_MENU_ID) {
+    await browser.tabs.sendMessage(tabId, {
+      action: NaranjoAction.openCustomPromptInput,
+      payload: { selectionText: input },
+    });
+    return;
+  }
+
+  const naranjoContexts = await getNaranjoContexts();
+  const context = naranjoContexts.find((c) => c.id === info.menuItemId);
+
+  if (context) {
+    await enqueueTask(
+      context.action,
+      input,
+      context.title,
+      context.prompt,
+      tabId,
+      context.modelId,
+    );
+  }
+}
+
 export function initContextMenuListener(): void {
-  browser.contextMenus.onClicked.addListener(async (info, tab) => {
-    const tabId = tab?.id;
-    const input = info.selectionText;
-
-    if (!tabId || !input) return;
-
-    if (info.menuItemId === CUSTOM_PROMPT_MENU_ID) {
-      await browser.tabs.sendMessage(tabId, {
-        action: NaranjoAction.openCustomPromptInput,
-        payload: { selectionText: input },
-      });
-      return;
-    }
-
-    const naranjoContexts = await getNaranjoContexts();
-    const context = naranjoContexts.find((c) => c.id === info.menuItemId);
-
-    if (context) {
-      await enqueueTask(
-        context.action,
-        input,
-        context.title,
-        context.prompt,
-        tabId,
-        context.modelId,
-      );
-    }
+  browser.contextMenus.onClicked.addListener((info, tab) => {
+    void handleContextMenuClick(info, tab);
   });
 }

@@ -17,17 +17,17 @@
 import { sendMessage } from "@/utils/messaging";
 import { getProviderConfig, saveProviderConfig } from "@/dao/ProviderConfigDAO";
 import {
-  OllamaProviderConfig,
-  GoogleProviderConfig,
-  OpenAIProviderConfig,
-  AnthropicProviderConfig,
-  ChromeBuiltinProviderConfig,
-  MistralProviderConfig,
-  XAIProviderConfig,
-  DeepSeekProviderConfig,
-  ProviderType
+  type OllamaProviderConfig,
+  type GoogleProviderConfig,
+  type OpenAIProviderConfig,
+  type AnthropicProviderConfig,
+  type ChromeBuiltinProviderConfig,
+  type MistralProviderConfig,
+  type XAIProviderConfig,
+  type DeepSeekProviderConfig,
 } from "@/entities/types";
 import { t } from "@/app/i18n";
+import { type ChromeAI } from "@/services/chromeBuiltinService";
 
 function applyI18n() {
   document.querySelectorAll<HTMLElement>("[data-i18n]").forEach((el) => {
@@ -42,7 +42,7 @@ function applyI18n() {
   });
 }
 
-document.addEventListener("DOMContentLoaded", async () => {
+async function setup() {
   applyI18n();
   // Elements
   const sidebarItems = document.querySelectorAll(".provider-item");
@@ -50,6 +50,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Ollama Elements
   const ollamaEnabledInput = document.getElementById("ollama-enabled") as HTMLInputElement;
+  const ollamaModeLocalInput = document.getElementById("ollama-mode-local") as HTMLInputElement;
+  const ollamaModeCloudInput = document.getElementById("ollama-mode-cloud") as HTMLInputElement;
+  const ollamaApiKeyLabel = document.getElementById("ollama-api-key-label") as HTMLLabelElement;
   const ollamaCloudApiKeyInput = document.getElementById("ollama-cloud-api-key") as HTMLInputElement;
   const ollamaOriginsHint = document.getElementById("ollama-origins-hint") as HTMLParagraphElement;
   const saveOllamaBtn = document.getElementById("save-ollama-btn") as HTMLButtonElement;
@@ -118,8 +121,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Check Chrome Built-in Availability
   async function checkChromeBuiltin() {
-    // @ts-ignore
-    const ai = window.ai || (typeof chrome !== 'undefined' ? (chrome.ai || chrome.aiOriginTrial) : null);
+    const g = globalThis as unknown as { ai?: ChromeAI; chrome?: { ai?: ChromeAI; aiOriginTrial?: ChromeAI } };
+    const ai: ChromeAI | null = g.ai ?? g.chrome?.ai ?? g.chrome?.aiOriginTrial ?? null;
     if (!ai || !ai.languageModel) {
       const sidebarItem = document.querySelector("[data-provider='chrome-builtin']") as HTMLElement;
       const section = document.getElementById("chrome-builtin-section");
@@ -148,6 +151,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  function syncOllamaModeUI(useCloud: boolean) {
+    if (useCloud) {
+      ollamaModeCloudInput.checked = true;
+      ollamaOriginsHint.style.display = "none";
+      ollamaApiKeyLabel.setAttribute("data-i18n", "ollama_cloud_api_key_label_required");
+      ollamaApiKeyLabel.textContent = t("ollama_cloud_api_key_label_required");
+    } else {
+      ollamaModeLocalInput.checked = true;
+      ollamaOriginsHint.style.display = "";
+      ollamaApiKeyLabel.setAttribute("data-i18n", "ollama_cloud_api_key_label_optional");
+      ollamaApiKeyLabel.textContent = t("ollama_cloud_api_key_label_optional");
+    }
+  }
+
   // Load existing configs
   async function loadConfigs() {
     try {
@@ -155,7 +172,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (ollamaConfig) {
         ollamaEnabledInput.checked = ollamaConfig.enabled;
         ollamaCloudApiKeyInput.value = ollamaConfig.cloudApiKey || "";
-        ollamaOriginsHint.style.display = ollamaConfig.cloudApiKey ? "none" : "";
+        // Backward compat: no useCloud field but cloudApiKey present → treat as cloud
+        const useCloud = ollamaConfig.useCloud ?? (!!ollamaConfig.cloudApiKey);
+        syncOllamaModeUI(useCloud);
       }
 
       const googleConfig = await getProviderConfig("google") as GoogleProviderConfig;
@@ -215,33 +234,44 @@ document.addEventListener("DOMContentLoaded", async () => {
     }, 3000);
   }
 
-  // Toggle origins hint based on cloud API key
-  ollamaCloudApiKeyInput.addEventListener("input", () => {
-    ollamaOriginsHint.style.display = ollamaCloudApiKeyInput.value.trim() ? "none" : "";
-  });
+  ollamaModeLocalInput.addEventListener("change", () => syncOllamaModeUI(false));
+  ollamaModeCloudInput.addEventListener("change", () => syncOllamaModeUI(true));
+
+  function notifyBackground() {
+    sendMessage({ action: "reloadProviderConfigs" }).catch((err) => {
+      console.warn("Background refresh triggered, but response not received", err);
+    });
+  }
 
   // Save Ollama config
-  saveOllamaBtn.addEventListener("click", async () => {
+  async function saveOllama() {
     try {
+      const useCloud = ollamaModeCloudInput.checked;
+      const apiKeyValue = ollamaCloudApiKeyInput.value.trim();
+
+      if (useCloud && !apiKeyValue) {
+        alert(t("msg_ollama_cloud_key_required"));
+        return;
+      }
+
       const currentConfig = await getProviderConfig("ollama") as OllamaProviderConfig;
       await saveProviderConfig({
         ...currentConfig,
         enabled: ollamaEnabledInput.checked,
-        cloudApiKey: ollamaCloudApiKeyInput.value.trim() || undefined,
+        useCloud,
+        cloudApiKey: useCloud ? (apiKeyValue || undefined) : undefined,
       });
-
       showStatus(statusOllama);
-      sendMessage({ action: "reloadProviderConfigs" }).catch(err => {
-        console.warn("Background refresh triggered, but response not received", err);
-      });
+      notifyBackground();
     } catch (error) {
       console.error("Failed to save Ollama config", error);
       alert(t("msg_provider_save_error"));
     }
-  });
+  }
+  saveOllamaBtn.addEventListener("click", () => { void saveOllama(); });
 
   // Save Google config
-  saveGoogleBtn.addEventListener("click", async () => {
+  async function saveGoogle() {
     try {
       const currentConfig = await getProviderConfig("google") as GoogleProviderConfig;
       await saveProviderConfig({
@@ -249,19 +279,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         enabled: googleEnabledInput.checked,
         apiKey: googleApiKeyInput.value.trim(),
       });
-
       showStatus(statusGoogle);
-      sendMessage({ action: "reloadProviderConfigs" }).catch(err => {
-        console.warn("Background refresh triggered, but response not received", err);
-      });
+      notifyBackground();
     } catch (error) {
       console.error("Failed to save Google config", error);
       alert(t("msg_provider_save_error"));
     }
-  });
+  }
+  saveGoogleBtn.addEventListener("click", () => { void saveGoogle(); });
 
   // Save OpenAI config
-  saveOpenaiBtn.addEventListener("click", async () => {
+  async function saveOpenai() {
     try {
       const currentConfig = await getProviderConfig("openai") as OpenAIProviderConfig;
       await saveProviderConfig({
@@ -269,19 +297,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         enabled: openaiEnabledInput.checked,
         apiKey: openaiApiKeyInput.value.trim(),
       });
-
       showStatus(statusOpenai);
-      sendMessage({ action: "reloadProviderConfigs" }).catch(err => {
-        console.warn("Background refresh triggered, but response not received", err);
-      });
+      notifyBackground();
     } catch (error) {
       console.error("Failed to save OpenAI config", error);
       alert(t("msg_provider_save_error"));
     }
-  });
+  }
+  saveOpenaiBtn.addEventListener("click", () => { void saveOpenai(); });
 
   // Save Anthropic config
-  saveAnthropicBtn.addEventListener("click", async () => {
+  async function saveAnthropic() {
     try {
       const currentConfig = await getProviderConfig("anthropic") as AnthropicProviderConfig;
       await saveProviderConfig({
@@ -289,19 +315,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         enabled: anthropicEnabledInput.checked,
         apiKey: anthropicApiKeyInput.value.trim(),
       });
-
       showStatus(statusAnthropic);
-      sendMessage({ action: "reloadProviderConfigs" }).catch(err => {
-        console.warn("Background refresh triggered, but response not received", err);
-      });
+      notifyBackground();
     } catch (error) {
       console.error("Failed to save Anthropic config", error);
       alert(t("msg_provider_save_error"));
     }
-  });
+  }
+  saveAnthropicBtn.addEventListener("click", () => { void saveAnthropic(); });
 
   // Save Mistral config
-  saveMistralBtn.addEventListener("click", async () => {
+  async function saveMistral() {
     try {
       const currentConfig = await getProviderConfig("mistral") as MistralProviderConfig;
       await saveProviderConfig({
@@ -309,19 +333,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         enabled: mistralEnabledInput.checked,
         apiKey: mistralApiKeyInput.value.trim(),
       });
-
       showStatus(statusMistral);
-      sendMessage({ action: "reloadProviderConfigs" }).catch(err => {
-        console.warn("Background refresh triggered, but response not received", err);
-      });
+      notifyBackground();
     } catch (error) {
       console.error("Failed to save Mistral config", error);
       alert(t("msg_provider_save_error"));
     }
-  });
+  }
+  saveMistralBtn.addEventListener("click", () => { void saveMistral(); });
 
   // Save xAI config
-  saveXaiBtn.addEventListener("click", async () => {
+  async function saveXai() {
     try {
       const currentConfig = await getProviderConfig("xai") as XAIProviderConfig;
       await saveProviderConfig({
@@ -329,19 +351,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         enabled: xaiEnabledInput.checked,
         apiKey: xaiApiKeyInput.value.trim(),
       });
-
       showStatus(statusXai);
-      sendMessage({ action: "reloadProviderConfigs" }).catch(err => {
-        console.warn("Background refresh triggered, but response not received", err);
-      });
+      notifyBackground();
     } catch (error) {
       console.error("Failed to save xAI config", error);
       alert(t("msg_provider_save_error"));
     }
-  });
+  }
+  saveXaiBtn.addEventListener("click", () => { void saveXai(); });
 
   // Save DeepSeek config
-  saveDeepseekBtn.addEventListener("click", async () => {
+  async function saveDeepseek() {
     try {
       const currentConfig = await getProviderConfig("deepseek") as DeepSeekProviderConfig;
       await saveProviderConfig({
@@ -349,33 +369,33 @@ document.addEventListener("DOMContentLoaded", async () => {
         enabled: deepseekEnabledInput.checked,
         apiKey: deepseekApiKeyInput.value.trim(),
       });
-
       showStatus(statusDeepseek);
-      sendMessage({ action: "reloadProviderConfigs" }).catch(err => {
-        console.warn("Background refresh triggered, but response not received", err);
-      });
+      notifyBackground();
     } catch (error) {
       console.error("Failed to save DeepSeek config", error);
       alert(t("msg_provider_save_error"));
     }
-  });
+  }
+  saveDeepseekBtn.addEventListener("click", () => { void saveDeepseek(); });
 
   // Save Chrome Built-in config
-  saveChromeBuiltinBtn.addEventListener("click", async () => {
+  async function saveChromeBuiltin() {
     try {
       const currentConfig = await getProviderConfig("chrome-builtin") as ChromeBuiltinProviderConfig;
       await saveProviderConfig({
         ...currentConfig,
         enabled: chromeBuiltinEnabledInput.checked,
       });
-
       showStatus(statusChromeBuiltin);
-      sendMessage({ action: "reloadProviderConfigs" }).catch(err => {
-        console.warn("Background refresh triggered, but response not received", err);
-      });
+      notifyBackground();
     } catch (error) {
       console.error("Failed to save Chrome Built-in config", error);
       alert(t("msg_provider_save_error"));
     }
-  });
+  }
+  saveChromeBuiltinBtn.addEventListener("click", () => { void saveChromeBuiltin(); });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  void setup();
 });

@@ -15,7 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { getProviderConfig } from "@/dao/ProviderConfigDAO";
-import { OpenAIProviderConfig, ConversationTurn } from "@/entities/types";
+import { type OpenAIProviderConfig, type ConversationTurn } from "@/entities/types";
 import { consumeOpenAICompatibleSSE } from "@/utils/streaming";
 
 /**
@@ -59,21 +59,21 @@ export async function getListOfModels(): Promise<string[]> {
       throw new Error(response.statusText);
     }
 
-    const result = await response.json();
+    const result = await response.json() as { data?: { id: string }[] };
     if (!result.data || !Array.isArray(result.data)) {
       throw new Error("Invalid response format");
     }
 
     // Filter for common chat models to avoid cluttering the UI
     const chatModels = result.data
-      .filter((model: any) => 
-        model.id.startsWith("gpt-") || 
+      .filter((model) =>
+        model.id.startsWith("gpt-") ||
         model.id.includes("o1-") ||
         // Support some common open source models if using a proxy
-        model.id.includes("llama") || 
+        model.id.includes("llama") ||
         model.id.includes("mistral")
       )
-      .map((model: any) => model.id);
+      .map((model) => model.id);
 
     return chatModels.length > 0 ? chatModels : ["gpt-4o", "gpt-4o-mini", "o1-mini"];
   } catch (error) {
@@ -127,15 +127,15 @@ export async function sendPrompt(params: {
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
+      const errorData = await response.json().catch(() => ({})) as { error?: { message?: string } };
       throw new Error(errorData.error?.message || response.statusText);
     }
 
     if (useStream) {
-      return await consumeOpenAICompatibleSSE(response, onChunk!);
+      return await consumeOpenAICompatibleSSE(response, onChunk);
     }
 
-    const result = await response.json();
+    const result = await response.json() as { choices?: Array<{ message?: { content: string } }> };
     if (!result.choices || !result.choices[0]?.message?.content) {
       throw new Error("Invalid response format from OpenAI API");
     }

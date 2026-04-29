@@ -21,17 +21,18 @@
  */
 
 import { getProviderConfig } from "@/dao/ProviderConfigDAO";
-import { OllamaProviderConfig, ConversationTurn } from "@/entities/types";
+import { type OllamaProviderConfig, type ConversationTurn } from "@/entities/types";
 
 const OLLAMA_LOCAL_BASE_URL = "http://localhost:11434/api";
 const OLLAMA_CLOUD_BASE_URL = "https://ollama.com/api";
 
-async function getConfig(): Promise<{ baseUrl: string; headers: Record<string, string> }> {
+async function getConfig(): Promise<{ baseUrl: string; headers: Record<string, string> } | null> {
   const config = await getProviderConfig("ollama") as OllamaProviderConfig;
-  if (!config || !config.enabled) {
-    throw new Error("Ollama provider is disabled in settings.");
-  }
-  if (config.cloudApiKey) {
+  if (!config || !config.enabled) return null;
+  // Backward compat: no useCloud field but cloudApiKey present → treat as cloud
+  const useCloud = config.useCloud ?? (!!config.cloudApiKey);
+  if (useCloud) {
+    if (!config.cloudApiKey) return null;
     return {
       baseUrl: OLLAMA_CLOUD_BASE_URL,
       headers: { "Authorization": `Bearer ${config.cloudApiKey}` },
@@ -58,8 +59,10 @@ export class OllamaServiceError extends Error {
  * @throws {OllamaServiceError} If the request fails or the response is invalid.
  */
 export async function getListOfModels(): Promise<string[]> {
+  const config = await getConfig();
+  if (!config) return [];
   try {
-    const { baseUrl, headers } = await getConfig();
+    const { baseUrl, headers } = config;
     const response = await fetch(`${baseUrl}/tags`, {
       signal: AbortSignal.timeout(10000),
       method: "GET",
@@ -71,12 +74,12 @@ export async function getListOfModels(): Promise<string[]> {
       throw new Error(`HTTP ${response.status}: ${body || response.statusText}`);
     }
 
-    const { models } = await response.json();
+    const { models } = await response.json() as { models?: { name: string }[] };
     if (!models || !Array.isArray(models)) {
       throw new Error("Invalid response format");
     }
 
-    return models.map((model: any) => model.name);
+    return models.map((model: { name: string }) => model.name);
   } catch (error) {
     throw new OllamaServiceError("Error pulling installed models", {
       error,
@@ -93,7 +96,9 @@ export async function pullModel(params: { model: string }): Promise<void> {
   const { model } = params;
 
   try {
-    const { baseUrl, headers } = await getConfig();
+    const config = await getConfig();
+    if (!config) throw new Error("Ollama provider is disabled in settings.");
+    const { baseUrl, headers } = config;
     if (baseUrl === OLLAMA_CLOUD_BASE_URL) return;
     const response = await fetch(`${baseUrl}/pull`, {
       signal: AbortSignal.timeout(10000),
@@ -135,7 +140,9 @@ export async function sendPrompt(params: {
   const useStream = !!onChunk;
 
   try {
-    const { baseUrl, headers } = await getConfig();
+    const config = await getConfig();
+    if (!config) throw new Error("Ollama provider is disabled in settings.");
+    const { baseUrl, headers } = config;
     const response = await fetch(`${baseUrl}/chat`, {
       signal: AbortSignal.timeout(120000),
       method: "POST",
@@ -172,10 +179,10 @@ export async function sendPrompt(params: {
         for (const line of lines) {
           if (!line.trim()) continue;
           try {
-            const data = JSON.parse(line);
+            const data = JSON.parse(line) as { message?: { content?: string } };
             if (data.message?.content) {
               fullContent += data.message.content;
-              onChunk!(data.message.content);
+              onChunk(data.message.content);
             }
           } catch {}
         }
@@ -183,7 +190,7 @@ export async function sendPrompt(params: {
       return fullContent;
     }
 
-    const result = await response.json();
+    const result = await response.json() as { message?: { content: string } };
     if (!result?.message?.content) {
       throw new Error("Invalid response format");
     }

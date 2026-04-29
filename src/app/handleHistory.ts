@@ -14,11 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { NaranjoAction, NaranjoTask, TaskStatus } from "@/entities/types";
+import { NaranjoAction, type TaskHistoryPage, TaskStatus } from "@/entities/types";
 import { sendMessage } from "@/utils/messaging";
+import { copyToClipboard } from "@/utils/clipboard";
 import { t } from "./i18n";
 import { renderMarkdown } from "./markdown";
 import { buildBugReportBody } from "./bugReport";
+
+const PAGE_SIZE = 5;
+let currentPage = 0;
 
 /**
  * Initializes the history tab by fetching tasks and setting up event listeners.
@@ -29,8 +33,27 @@ export async function initHistory() {
     clearBtn.onclick = async () => {
       if (confirm("Are you sure you want to clear all history?")) {
         await sendMessage({ action: NaranjoAction.clearTaskHistory });
+        currentPage = 0;
         await renderHistory();
       }
+    };
+  }
+
+  const prevBtn = document.getElementById("history-prev-page");
+  if (prevBtn) {
+    prevBtn.onclick = async () => {
+      if (currentPage > 0) {
+        currentPage -= 1;
+        await renderHistory();
+      }
+    };
+  }
+
+  const nextBtn = document.getElementById("history-next-page");
+  if (nextBtn) {
+    nextBtn.onclick = async () => {
+      currentPage += 1;
+      await renderHistory();
     };
   }
 
@@ -42,23 +65,31 @@ export async function initHistory() {
     if (document.visibilityState === "visible") {
       const activityTab = document.querySelector('.tab-btn[data-tab="activity"]');
       if (activityTab?.classList.contains("active")) {
-        renderHistory();
+        void renderHistory();
       }
     }
   }, 5000);
 }
 
+let currentAnswerText: string | null = null;
+
 /**
- * Sets up the answer modal close button handler.
+ * Sets up the answer modal close and copy button handlers.
  */
 function initAnswerModal() {
   const closeBtn = document.getElementById("close-answer-modal");
+  const copyBtn = document.getElementById("copy-answer-modal");
   const modal = document.getElementById("answer-modal") as HTMLDialogElement | null;
   if (closeBtn && modal) {
     closeBtn.onclick = () => modal.close();
     modal.addEventListener("click", (e) => {
       if (e.target === modal) modal.close();
     });
+  }
+  if (copyBtn) {
+    copyBtn.onclick = () => {
+      if (currentAnswerText !== null) void copyToClipboard(currentAnswerText);
+    };
   }
 }
 
@@ -69,9 +100,12 @@ function openAnswerModal(content: string) {
   const modal = document.getElementById("answer-modal") as HTMLDialogElement | null;
   const contentEl = document.getElementById("answer-modal-content");
   const titleEl = document.querySelector("#answer-modal .answer-modal-header span");
+  const copyBtn = document.getElementById("copy-answer-modal");
   if (!modal || !contentEl) return;
   if (titleEl) titleEl.textContent = t("modal_answer_title");
   contentEl.innerHTML = renderMarkdown(content);
+  currentAnswerText = content;
+  copyBtn?.classList.remove("hidden");
   modal.showModal();
 }
 
@@ -82,35 +116,53 @@ function openInputModal(text: string) {
   const modal = document.getElementById("answer-modal") as HTMLDialogElement | null;
   const contentEl = document.getElementById("answer-modal-content");
   const titleEl = document.querySelector("#answer-modal .answer-modal-header span");
+  const copyBtn = document.getElementById("copy-answer-modal");
   if (!modal || !contentEl) return;
   if (titleEl) titleEl.textContent = t("modal_input_title");
   contentEl.textContent = text;
+  currentAnswerText = null;
+  copyBtn?.classList.add("hidden");
   modal.showModal();
 }
 
 /**
- * Fetches task history and renders it in the table.
+ * Fetches the current page of task history and renders it in the table.
  */
 async function renderHistory() {
-  const tasks: NaranjoTask[] = await sendMessage({
-    action: NaranjoAction.getTaskHistory,
+  const page = await sendMessage<TaskHistoryPage>({
+    action: NaranjoAction.getTaskHistoryPage,
+    payload: { offset: currentPage * PAGE_SIZE, limit: PAGE_SIZE },
   });
 
   const emptyState = document.getElementById("history-empty-state");
   const table = document.getElementById("task-history-table");
   const tbody = document.getElementById("task-history-body");
+  const pagination = document.getElementById("history-pagination");
 
   if (!tbody || !emptyState || !table) return;
 
-  if (!tasks || tasks.length === 0) {
+  const total = page?.total ?? 0;
+  const tasks = page?.tasks ?? [];
+
+  // If we're past the last page (e.g. items deleted), drop back and re-render.
+  if (total > 0 && tasks.length === 0 && currentPage > 0) {
+    currentPage = Math.max(0, Math.ceil(total / PAGE_SIZE) - 1);
+    await renderHistory();
+    return;
+  }
+
+  if (total === 0) {
     emptyState.classList.remove("hidden");
     table.classList.add("hidden");
+    pagination?.classList.add("hidden");
     return;
   }
 
   emptyState.classList.add("hidden");
   table.classList.remove("hidden");
   tbody.innerHTML = "";
+
+  updatePaginationControls(total);
 
   tasks.forEach((task) => {
     const tr = document.createElement("tr");
@@ -148,7 +200,8 @@ async function renderHistory() {
       </td>
       <td class="col-actions">
         ${hasAnswer
-          ? `<button class="table-td-button-action view-answer-btn" data-id="${task.id}" title="${t("btn_view_answer")}"><i class="fa fa-eye"></i></button>`
+          ? `<button class="table-td-button-action view-answer-btn" data-id="${task.id}" title="${t("btn_view_answer")}"><i class="fa fa-eye"></i></button>
+             <button class="table-td-button-action copy-answer-btn" data-id="${task.id}" title="${t("btn_copy_response")}"><i class="fa fa-copy"></i></button>`
           : isFailed
             ? `<button class="table-td-button-action report-bug-btn" data-id="${task.id}" title="${t("btn_report_bug")}"><i class="fa fa-bug"></i></button>`
             : `<span class="col-actions-placeholder"></span>`}
@@ -158,7 +211,7 @@ async function renderHistory() {
       </td>
     `;
 
-    const inputCell = tr.querySelector(".col-input") as HTMLTableCellElement | null;
+    const inputCell = tr.querySelector(".col-input");
     if (inputCell) {
       inputCell.addEventListener("click", () => openInputModal(task.input));
     }
@@ -166,6 +219,8 @@ async function renderHistory() {
     if (hasAnswer) {
       const viewBtn = tr.querySelector(".view-answer-btn") as HTMLButtonElement;
       viewBtn.onclick = () => openAnswerModal(task.output!);
+      const copyBtn = tr.querySelector(".copy-answer-btn") as HTMLButtonElement;
+      copyBtn.onclick = () => copyToClipboard(task.output!);
     }
 
     if (isFailed) {
@@ -199,4 +254,27 @@ async function renderHistory() {
 
     tbody.appendChild(tr);
   });
+}
+
+function updatePaginationControls(total: number) {
+  const pagination = document.getElementById("history-pagination");
+  const prevBtn = document.getElementById("history-prev-page") as HTMLButtonElement | null;
+  const nextBtn = document.getElementById("history-next-page") as HTMLButtonElement | null;
+  const info = document.getElementById("history-page-info");
+
+  if (!pagination) return;
+
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  if (currentPage >= totalPages) currentPage = totalPages - 1;
+
+  pagination.classList.toggle("hidden", totalPages <= 1);
+
+  if (prevBtn) prevBtn.disabled = currentPage <= 0;
+  if (nextBtn) nextBtn.disabled = currentPage >= totalPages - 1;
+  if (info) {
+    info.textContent = t("pagination_page_info", [
+      String(currentPage + 1),
+      String(totalPages),
+    ]);
+  }
 }

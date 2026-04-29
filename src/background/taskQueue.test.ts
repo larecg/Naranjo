@@ -19,14 +19,14 @@ import { enqueueTask, processQueue } from "./taskQueue";
 import { addTask, updateTask, getPendingTasks } from "@/dao/NaranjoTaskDAO";
 import { sendPrompt as sendOllamaPrompt } from "@/services/ollamaService";
 import { sendPrompt as sendGeminiPrompt } from "@/services/googleService";
-import { sendPrompt as sendOpenAIPrompt } from "@/services/openaiService";
-import { sendPrompt as sendAnthropicPrompt } from "@/services/anthropicService";
+import "@/services/openaiService";
+import "@/services/anthropicService";
 import { sendPrompt as sendChromeBuiltinPrompt } from "@/services/chromeBuiltinService";
 import { sendPrompt as sendMistralPrompt } from "@/services/mistralService";
 import { sendPrompt as sendXAIPrompt } from "@/services/xaiService";
 import { sendPrompt as sendDeepSeekPrompt } from "@/services/deepseekService";
-import { getSelectedModel, loadState } from "./state";
-import { NaranjoAction, TaskStatus, NaranjoTask } from "@/entities/types";
+import { getSelectedModel } from "./state";
+import { NaranjoAction, TaskStatus, type NaranjoTask } from "@/entities/types";
 
 jest.mock("@/dao/NaranjoTaskDAO", () => ({
   addTask: jest.fn(),

@@ -224,6 +224,64 @@ describe("content/toastOverlay", () => {
     });
   });
 
+  describe("copy response button", () => {
+    beforeEach(() => {
+      Object.assign(navigator, {
+        clipboard: { writeText: jest.fn().mockResolvedValue(undefined) },
+      });
+    });
+
+    test("SUCCESS toast renders a copy-response button", () => {
+      showToast("Verbatim model answer", "SUCCESS", "task-copy-1");
+
+      const copyBtn = document.querySelector(".naranjo-copy-btn") as HTMLButtonElement;
+      expect(copyBtn).not.toBeNull();
+      expect(copyBtn.title).toBe("btn_copy_response");
+    });
+
+    test("non-SUCCESS toasts do NOT render a copy button", () => {
+      showToast("Info", "INFO", "task-copy-info");
+      showToast("Warn", "WARNING", "task-copy-warn");
+      showToast("Err", "ERROR", "task-copy-err");
+
+      expect(document.querySelectorAll(".naranjo-copy-btn").length).toBe(0);
+    });
+
+    test("clicking the copy button writes the verbatim content to the clipboard", () => {
+      showToast("**bold** raw markdown", "SUCCESS", "task-copy-click");
+
+      const copyBtn = document.querySelector(".naranjo-copy-btn") as HTMLButtonElement;
+      copyBtn.click();
+
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith("**bold** raw markdown");
+    });
+
+    test("finalizeToast to SUCCESS appends a copy button with the final raw content", () => {
+      showStreamingToast("task-copy-stream");
+      finalizeToast("task-copy-stream", "SUCCESS", "streamed raw content");
+
+      const copyBtn = document.querySelector(
+        '[data-task-id="task-copy-stream"] .naranjo-copy-btn',
+      ) as HTMLButtonElement;
+      expect(copyBtn).not.toBeNull();
+      copyBtn.click();
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith("streamed raw content");
+    });
+
+    test("after a follow-up refinement, the copy button reflects the refined raw content", () => {
+      showStreamingToast("task-copy-refine", NaranjoAction.replaceText);
+      finalizeToast("task-copy-refine", "SUCCESS", "first draft", jest.fn());
+      transitionToastToStreaming("task-copy-refine");
+      finalizeToast("task-copy-refine", "SUCCESS", "refined answer", jest.fn());
+
+      const copyBtn = document.querySelector(
+        '[data-task-id="task-copy-refine"] .naranjo-copy-btn',
+      ) as HTMLButtonElement;
+      copyBtn.click();
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith("refined answer");
+    });
+  });
+
   describe("follow-up input area", () => {
     test("SUCCESS toast with taskId renders a follow-up input area", () => {
       showToast("Some result", "SUCCESS", "task-fu-1");

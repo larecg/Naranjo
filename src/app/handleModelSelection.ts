@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { LLMModel } from "@/entities/types";
+import { type LLMModel } from "@/entities/types";
 import { sendMessage } from "@/utils/messaging";
 
 /**
@@ -22,7 +22,7 @@ import { sendMessage } from "@/utils/messaging";
  * @returns Promise that resolves to an array of LLMModel objects
  */
 async function getAvailableModels(): Promise<LLMModel[]> {
-  return sendMessage({ action: "getLocalLLModels" }) ?? [];
+  return sendMessage<LLMModel[]>({ action: "getLocalLLModels" }) ?? [];
 }
 
 /**
@@ -30,7 +30,7 @@ async function getAvailableModels(): Promise<LLMModel[]> {
  * @returns Promise that resolves to the identifier or null if none is selected
  */
 async function getSelectedModel(): Promise<string | null> {
-  return sendMessage({ action: "getSelectedModel" }) ?? null;
+  return sendMessage<string | null>({ action: "getSelectedModel" }) ?? null;
 }
 
 /**
@@ -42,7 +42,7 @@ export function handleSelectedModel() {
     "naranjo-models"
   ) as HTMLSelectElement;
   const payload = select.options[select.selectedIndex].value;
-  sendMessage({ action: "setSelectedModel", payload });
+  void sendMessage({ action: "setSelectedModel", payload });
 }
 
 /**
@@ -86,4 +86,6 @@ export async function initModelSelection(): Promise<void> {
 }
 
 /** Set up select to list model options on window load */
-window.addEventListener("load", initModelSelection);
+window.addEventListener("load", () => {
+  void initModelSelection();
+});

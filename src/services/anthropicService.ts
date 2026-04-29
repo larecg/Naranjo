@@ -15,7 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { getProviderConfig } from "@/dao/ProviderConfigDAO";
-import { AnthropicProviderConfig, ConversationTurn } from "@/entities/types";
+import { type AnthropicProviderConfig, type ConversationTurn } from "@/entities/types";
 
 /**
  * Provides functions to interact with the Anthropic service.
@@ -57,8 +57,8 @@ export async function getListOfModels(): Promise<string[]> {
 
     if (!response.ok) return [];
 
-    const data = await response.json();
-    return (data.data as { id: string }[]).map((m) => m.id);
+    const data = await response.json() as { data?: { id: string }[] };
+    return (data.data ?? []).map((m) => m.id);
   } catch (error) {
     console.error("Failed to fetch Anthropic models", error);
     return [];
@@ -111,7 +111,7 @@ export async function sendPrompt(params: {
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
+      const errorData = await response.json().catch(() => ({})) as { error?: { message?: string } };
       throw new Error(errorData.error?.message || response.statusText);
     }
 
@@ -134,10 +134,10 @@ export async function sendPrompt(params: {
             currentEvent = line.slice(7).trim();
           } else if (line.startsWith("data: ") && currentEvent === "content_block_delta") {
             try {
-              const data = JSON.parse(line.slice(6));
+              const data = JSON.parse(line.slice(6)) as { delta?: { type: string; text: string } };
               if (data.delta?.type === "text_delta" && data.delta?.text) {
                 fullContent += data.delta.text;
-                onChunk!(data.delta.text);
+                onChunk(data.delta.text);
               }
             } catch {}
           }
@@ -146,7 +146,7 @@ export async function sendPrompt(params: {
       return fullContent;
     }
 
-    const result = await response.json();
+    const result = await response.json() as { content?: Array<{ text: string }> };
     if (!result.content || !result.content[0]?.text) {
       throw new Error("Invalid response format from Anthropic API");
     }

@@ -55,6 +55,7 @@
             display: flex;
             width: 100%;
             max-width: 900px;
+            height: calc(100vh - 80px);
             min-height: 500px;
             background-color: var(--bg-color);
             border: 1px solid var(--border-color);
@@ -64,9 +65,17 @@
         }
 
         .sidebar {
-            width: 250px;
+            flex: 0 0 250px;
             border-right: 1px solid var(--border-color);
             background-color: rgba(0, 0, 0, 0.02);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .provider-list-wrapper {
+            flex: 1;
+            overflow-y: auto;
         }
 
         .sidebar h2 {
@@ -102,6 +111,7 @@
         .content {
             flex-grow: 1;
             padding: 30px;
+            overflow-y: auto;
         }
 
         .form-group {
@@ -164,22 +174,115 @@
         .provider-section.active {
             display: block;
         }
+
+        .sidebar-footer {
+            border-top: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .changelog-item {
+            font-size: 0.9rem;
+            color: gray;
+        }
+
+        .changelog-item:hover {
+            color: var(--text-color);
+        }
+
+        .changelog-item.active {
+            color: white;
+        }
+
+        .changelog-entry {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+        }
+
+        .changelog-date-header {
+            font-weight: bold;
+            font-size: 0.95rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .changelog-items {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .changelog-items li {
+            margin-bottom: 6px;
+            line-height: 1.5;
+        }
+
+        .changelog-tag {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: bold;
+            padding: 1px 7px;
+            border-radius: 10px;
+            margin-right: 6px;
+            vertical-align: middle;
+            text-transform: uppercase;
+        }
+
+        .changelog-tag.feature {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .changelog-tag.fix {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        .changelog-tag.improvement {
+            background-color: #fef9c3;
+            color: #854d0e;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .changelog-tag.feature { background-color: #166534; color: #dcfce7; }
+            .changelog-tag.fix { background-color: #1e40af; color: #dbeafe; }
+            .changelog-tag.improvement { background-color: #854d0e; color: #fef9c3; }
+        }
+
+        .changelog-screenshot {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 14px;
+            border: 1px solid var(--border-color);
+            display: block;
+        }
+
+        .changelog-screenshot-caption {
+            font-size: 0.8rem;
+            color: gray;
+            margin-top: 4px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="sidebar">
             <h2 data-i18n="options_providers_heading">Providers</h2>
-            <ul class="provider-list">
-                <li class="provider-item active" data-provider="ollama">Ollama</li>
-                <li class="provider-item" data-provider="google">Google Gemini</li>
-                <li class="provider-item" data-provider="openai">OpenAI</li>
-                <li class="provider-item" data-provider="anthropic">Anthropic Claude</li>
-                <li class="provider-item" data-provider="mistral">Mistral AI</li>
-                <li class="provider-item" data-provider="xai">xAI (Grok)</li>
-                <li class="provider-item" data-provider="deepseek">DeepSeek</li>
-                <li class="provider-item" data-provider="chrome-builtin">Chrome Built-in AI</li>
-            </ul>
+            <div class="provider-list-wrapper">
+                <ul class="provider-list">
+                    <li class="provider-item active" data-provider="ollama">Ollama</li>
+                    <li class="provider-item" data-provider="google">Google Gemini</li>
+                    <li class="provider-item" data-provider="openai">OpenAI</li>
+                    <li class="provider-item" data-provider="anthropic">Anthropic Claude</li>
+                    <li class="provider-item" data-provider="mistral">Mistral AI</li>
+                    <li class="provider-item" data-provider="xai">xAI (Grok)</li>
+                    <li class="provider-item" data-provider="deepseek">DeepSeek</li>
+                    <li class="provider-item" data-provider="chrome-builtin">Chrome Built-in AI</li>
+                </ul>
+            </div>
+            <div class="sidebar-footer">
+                <div class="provider-item changelog-item" data-provider="changelog" data-i18n="options_changelog_sidebar">Changelog</div>
+            </div>
         </div>
         <div class="content">
             <h1 data-i18n="options_configuration_heading">Configuration</h1>
@@ -191,9 +294,22 @@
                     <input type="checkbox" id="ollama-enabled" checked>
                 </div>
                 <div class="form-group">
-                    <label for="ollama-cloud-api-key" data-i18n="ollama_cloud_api_key_label">Ollama Cloud API Key (optional)</label>
+                    <label data-i18n="ollama_mode_label">Mode</label>
+                    <div>
+                        <label>
+                            <input type="radio" name="ollama-mode" id="ollama-mode-local" value="local" checked>
+                            <span data-i18n="ollama_mode_local">Local</span>
+                        </label>
+                        &nbsp;&nbsp;
+                        <label>
+                            <input type="radio" name="ollama-mode" id="ollama-mode-cloud" value="cloud">
+                            <span data-i18n="ollama_mode_cloud">Cloud</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="ollama-cloud-api-key" id="ollama-api-key-label" data-i18n="ollama_cloud_api_key_label_optional">Ollama Cloud API Key (optional)</label>
                     <input type="text" id="ollama-cloud-api-key" placeholder="">
-                    <p style="font-size: 0.85em; color: gray;" data-i18n="ollama_cloud_api_key_hint">Leave empty to use local Ollama at localhost:11434.</p>
                     <p id="ollama-origins-hint" style="font-size: 0.85em; color: gray;" data-i18n="ollama_origins_hint">To allow the extension to communicate with Ollama, set: export OLLAMA_ORIGINS="moz-extension://*,chrome-extension://*"</p>
                 </div>
                 <button id="save-ollama-btn" data-i18n="btn_save_ollama">Save Ollama Settings</button>
@@ -300,6 +416,53 @@
                 </div>
                 <button id="save-chrome-builtin-btn" data-i18n="btn_save_settings">Save Settings</button>
                 <div id="status-chrome-builtin" class="status" data-i18n="msg_settings_saved">Settings saved!</div>
+            </div>
+            <div id="changelog-section" class="provider-section">
+                <h2 data-i18n="options_changelog_title">Changelog</h2>
+
+                <!-- Add new entries at the top (newest first).
+                     To add a screenshot: place the image in public/changelog/ and add inside the entry:
+                     <img class="changelog-screenshot" src="changelog/YYYY-MM-DD-description.png" alt="...">
+                     <p class="changelog-screenshot-caption">Caption text</p> -->
+
+                <div class="changelog-entry">
+                    <div class="changelog-date-header">April 2026</div>
+                    <ul class="changelog-items">
+                        <li><span class="changelog-tag feature">feature</span> Star a context to make it the default</li>
+                        <li><span class="changelog-tag feature">feature</span> Copy responses to clipboard with one click</li>
+                        <li><span class="changelog-tag feature">feature</span> Refine a response with a follow-up without leaving the page</li>
+                        <li><span class="changelog-tag feature">feature</span> Type a custom prompt on the fly from the quick menu</li>
+                        <li><span class="changelog-tag feature">feature</span> Report a bug directly from error messages or activity history</li>
+                        <li><span class="changelog-tag improvement">improvement</span> Changes only apply after you confirm with Apply or Cancel</li>
+                        <li><span class="changelog-tag improvement">improvement</span> History now paginates instead of loading everything at once</li>
+                        <li><span class="changelog-tag improvement">improvement</span> Helpful setup guide shown when no providers are configured yet</li>
+                        <li><span class="changelog-tag improvement">improvement</span> Cleaner look and feel across the UI</li>
+                        <li><span class="changelog-tag improvement">improvement</span> Context editing now opens in a focused modal</li>
+                        <li><span class="changelog-tag fix">fix</span> Several notification display glitches resolved</li>
+                        <li><span class="changelog-tag fix">fix</span> Various stability improvements</li>
+                    </ul>
+                </div>
+
+                <div class="changelog-entry">
+                    <div class="changelog-date-header">March 2026</div>
+                    <ul class="changelog-items">
+                        <li><span class="changelog-tag feature">feature</span> Responses stream in as they are generated</li>
+                        <li><span class="changelog-tag feature">feature</span> Expand and edit your prompt in a full-size editor</li>
+                        <li><span class="changelog-tag feature">feature</span> View the full input of any past task in history</li>
+                        <li><span class="changelog-tag feature">feature</span> Pick a different model per context, overriding the default</li>
+                        <li><span class="changelog-tag feature">feature</span> Mistral AI, xAI (Grok), and DeepSeek are now supported</li>
+                        <li><span class="changelog-tag feature">feature</span> Dark mode with automatic system preference detection</li>
+                        <li><span class="changelog-tag feature">feature</span> Multiple AI providers can now be configured and used side by side</li>
+                        <li><span class="changelog-tag feature">feature</span> Select text on any page to instantly open the quick menu</li>
+                        <li><span class="changelog-tag feature">feature</span> Built-in user guide to help you get started</li>
+                        <li><span class="changelog-tag feature">feature</span> Available in English and Spanish</li>
+                        <li><span class="changelog-tag feature">feature</span> Richer notifications that give clearer feedback on what's happening</li>
+                        <li><span class="changelog-tag improvement">improvement</span> Prompts now run reliably in the background without blocking the browser</li>
+                        <li><span class="changelog-tag improvement">improvement</span> Keyboard shortcuts work more consistently across sites</li>
+                        <li><span class="changelog-tag improvement">improvement</span> Fresh look and new name — welcome to Naranjo</li>
+                    </ul>
+                </div>
+
             </div>
         </div>
     </div>

@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title data-i18n="title">Naranjo — AI text processing in your browser</title>
-  <meta name="description" data-i18n="metaDescription" content="Naranjo — process selected text on any webpage with AI. Supports OpenAI, Claude, Gemini, Mistral, xAI Grok, DeepSeek, Ollama, and Chrome Built-in AI." />
+  <meta name="description" data-i18n="metaDescription" content="Naranjo — process selected text on any webpage with AI. Supports OpenAI, Claude, Gemini, Mistral, xAI Grok, DeepSeek, and Ollama (local &amp; cloud)." />
   <link rel="icon" href="icon.png" type="image/png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -330,7 +330,7 @@
   <!-- Hero -->
   <section class="hero">
     <img src="icon.png" alt="Naranjo icon" class="logo" />
-    <span class="version-badge">v0.3.0</span>
+    <span class="version-badge">v0.5.0</span>
     <h1>Naranjo</h1>
     <p class="tagline" data-i18n="tagline">
       Select any text on any webpage, right-click, and process it with your AI of choice — locally or in the cloud.
@@ -396,8 +396,7 @@
   <section class="providers">
     <span class="section-label" data-i18n="providersLabel">Supported providers</span>
     <div class="providers-row">
-      <span class="provider-pill local" data-i18n="p1">Ollama (local)</span>
-      <span class="provider-pill local" data-i18n="p2">Chrome Built-in AI (local)</span>
+      <span class="provider-pill local" data-i18n="p1">Ollama (local &amp; cloud)</span>
       <span class="provider-pill" data-i18n="p3">OpenAI</span>
       <span class="provider-pill" data-i18n="p4">Google Gemini</span>
       <span class="provider-pill" data-i18n="p5">Anthropic Claude</span>
@@ -422,7 +421,7 @@
     const translations = {
       es: {
         title:           'Naranjo — Procesamiento de texto con IA en tu navegador',
-        metaDescription: 'Naranjo — procesa texto seleccionado en cualquier página web con IA. Compatible con OpenAI, Claude, Gemini, Mistral, xAI Grok, DeepSeek, Ollama e IA integrada en Chrome.',
+        metaDescription: 'Naranjo — procesa texto seleccionado en cualquier página web con IA. Compatible con OpenAI, Claude, Gemini, Mistral, xAI Grok, DeepSeek y Ollama (local y nube).',
         tagline:         'Selecciona cualquier texto en cualquier página web, haz clic derecho y procésalo con tu IA favorita, de forma local o en la nube.',
         cta:             'Agregar a Chrome — es gratis',
         howItWorksLabel: 'Cómo funciona',
@@ -441,8 +440,7 @@
         f6Title:         'Inglés y español',
         f6Body:          'Interfaz completamente localizada en inglés y español, con soporte de tema claro, oscuro y del sistema.',
         providersLabel:  'Proveedores compatibles',
-        p1:              'Ollama (local)',
-        p2:              'IA integrada en Chrome (local)',
+        p1:              'Ollama (local y nube)',
         p3:              'OpenAI',
         p4:              'Google Gemini',
         p5:              'Anthropic Claude',

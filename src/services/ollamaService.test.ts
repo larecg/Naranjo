@@ -71,11 +71,12 @@ describe("OllamaService", () => {
       await expect(getListOfModels()).rejects.toThrow(OllamaServiceError);
     });
 
-    test("it should use Ollama Cloud URL and Bearer auth when cloudApiKey is set", async () => {
+    test("it should use Ollama Cloud URL and Bearer auth when useCloud is true", async () => {
       const { getProviderConfig } = require("@/dao/ProviderConfigDAO");
       (getProviderConfig as jest.Mock).mockResolvedValueOnce({
         id: "ollama",
         enabled: true,
+        useCloud: true,
         cloudApiKey: "test-cloud-key",
       });
       (global.fetch as jest.Mock).mockResolvedValue({
@@ -90,6 +91,62 @@ describe("OllamaService", () => {
         expect.objectContaining({
           headers: { "Authorization": "Bearer test-cloud-key" },
         })
+      );
+    });
+
+    test("it should use Cloud URL when cloudApiKey is set but useCloud is absent (backward compat)", async () => {
+      const { getProviderConfig } = require("@/dao/ProviderConfigDAO");
+      (getProviderConfig as jest.Mock).mockResolvedValueOnce({
+        id: "ollama",
+        enabled: true,
+        cloudApiKey: "legacy-key",
+      });
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ models: [] }),
+      });
+
+      await getListOfModels();
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        "https://ollama.com/api/tags",
+        expect.objectContaining({
+          headers: { "Authorization": "Bearer legacy-key" },
+        })
+      );
+    });
+
+    test("it should return empty list when useCloud is true but cloudApiKey is missing", async () => {
+      const { getProviderConfig } = require("@/dao/ProviderConfigDAO");
+      (getProviderConfig as jest.Mock).mockResolvedValueOnce({
+        id: "ollama",
+        enabled: true,
+        useCloud: true,
+      });
+
+      const result = await getListOfModels();
+      expect(result).toEqual([]);
+      expect(global.fetch).not.toHaveBeenCalled();
+    });
+
+    test("it should use local URL when useCloud is false even if cloudApiKey is present", async () => {
+      const { getProviderConfig } = require("@/dao/ProviderConfigDAO");
+      (getProviderConfig as jest.Mock).mockResolvedValueOnce({
+        id: "ollama",
+        enabled: true,
+        useCloud: false,
+        cloudApiKey: "some-saved-key",
+      });
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ models: [] }),
+      });
+
+      await getListOfModels();
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        "http://localhost:11434/api/tags",
+        expect.objectContaining({ method: "GET" })
       );
     });
   });
@@ -129,6 +186,7 @@ describe("OllamaService", () => {
       (getProviderConfig as jest.Mock).mockResolvedValueOnce({
         id: "ollama",
         enabled: true,
+        useCloud: true,
         cloudApiKey: "test-cloud-key",
       });
 
@@ -209,7 +267,6 @@ describe("OllamaService", () => {
     });
 
     test("it should send stream:true to the API when onChunk is provided", async () => {
-      const encoder = new TextEncoder();
       const stream = new ReadableStream({
         start(controller) { controller.close(); },
       });

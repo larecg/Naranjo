@@ -17,6 +17,8 @@
 import browser from "webextension-polyfill";
 import { t } from "./i18n";
 
+type HelpItem = { title: string; description: string } | { icon: string; title: string; description: string };
+
 /**
  * Returns the help content data structure with localized strings.
  */
@@ -31,7 +33,7 @@ function getHelpData() {
         { title: t('help_step1_title'), description: t('help_step1_desc') },
         { title: t('help_step2_title'), description: t('help_step2_desc') },
         { title: t('help_step3_title'), description: t('help_step3_desc') }
-      ]
+      ] as HelpItem[]
     },
     {
       id: 'faq',
@@ -127,7 +129,7 @@ function renderHelpContent(container: HTMLElement, hasVisitedHelp: boolean) {
       } else {
         const li = document.createElement('li');
         li.innerHTML = `
-          <strong><i class="fa ${(item as any).icon}"></i> ${item.title}</strong>
+          <strong><i class="fa ${'icon' in item ? item.icon : ''}"></i> ${item.title}</strong>
           <span>${item.description}</span>
         `;
         list.appendChild(li);
@@ -144,7 +146,7 @@ function renderHelpContent(container: HTMLElement, hasVisitedHelp: boolean) {
   const openBtn = document.getElementById('open-shortcut-settings');
   if (openBtn) {
     openBtn.addEventListener('click', () => {
-      browser.tabs.create({ url: 'chrome://extensions/shortcuts' });
+      void browser.tabs.create({ url: 'chrome://extensions/shortcuts' });
     });
   }
 }

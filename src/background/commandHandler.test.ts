@@ -15,7 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import browser from "webextension-polyfill";
-import { initMessageListener, initCommandListener } from "./commandHandler";
+import { initMessageListener, initCommandListener, handleCommand } from "./commandHandler";
 import {
   getNaranjoContextById,
   getNaranjoContexts,
@@ -29,7 +29,7 @@ import { enqueueTask, sendErrorMessage } from "./taskQueue";
 import {
   debouncedSetupContextMenu as setupContextMenu
 } from "./contextMenu";
-import { NaranjoAction, APIMessages, NaranjoContext } from "@/entities/types";
+import { NaranjoAction, type APIMessages, type NaranjoContext } from "@/entities/types";
 
 jest.mock("@/dao/NaranjoContextDAO", () => ({
   getNaranjoContexts: jest.fn(),
@@ -41,6 +41,7 @@ jest.mock("@/dao/NaranjoContextDAO", () => ({
 
 jest.mock("@/dao/NaranjoTaskDAO", () => ({
   getAllTasks: jest.fn(),
+  getTasksPage: jest.fn(),
   deleteTask: jest.fn(),
   clearTaskHistory: jest.fn(),
 }));
@@ -66,17 +67,13 @@ jest.mock("./contextMenu", () => ({
 
 describe("background/commandHandler", () => {
   let messageListener: (message: APIMessages, sender: browser.Runtime.MessageSender) => Promise<unknown> | boolean;
-  let commandListener: (command: string) => Promise<void>;
 
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
-    
+
     (browser.runtime.onMessage.addListener as jest.Mock).mockImplementation((listener) => {
       messageListener = listener;
-    });
-    (browser.commands.onCommand.addListener as jest.Mock).mockImplementation((listener) => {
-      commandListener = listener;
     });
 
     initMessageListener();
@@ -92,7 +89,7 @@ describe("background/commandHandler", () => {
       const { refreshLocalLLModels } = require("./state");
       const message: APIMessages = { action: "reloadProviderConfigs" };
       
-      await messageListener(message, {} as browser.Runtime.MessageSender);
+      await messageListener(message, {});
       
       expect(refreshLocalLLModels).toHaveBeenCalled();
     });
@@ -170,9 +167,18 @@ describe("background/commandHandler", () => {
       (getSelectedModel as jest.Mock).mockResolvedValue("llama3");
       
       const message: APIMessages = { action: "getSelectedModel" };
-      const result = await messageListener(message, {} as browser.Runtime.MessageSender);
+      const result = await messageListener(message, {});
       
       expect(result).toBe("llama3");
+    });
+
+    test("it should provide the currently set default context ID to the user interface", async () => {
+      (getDefaultContextId as jest.Mock).mockResolvedValue("ctx-1");
+
+      const message: APIMessages = { action: "getDefaultContextId" };
+      const result = await messageListener(message, {});
+
+      expect(result).toBe("ctx-1");
     });
 
     test("it should provide the list of available actions to the user interface", async () => {
@@ -180,7 +186,7 @@ describe("background/commandHandler", () => {
       (getNaranjoContexts as jest.Mock).mockResolvedValue(mockContexts);
 
       const message: APIMessages = { action: "getNaranjoContexts" };
-      const result = await messageListener(message, {} as browser.Runtime.MessageSender);
+      const result = await messageListener(message, {});
 
       expect(result).toEqual(mockContexts);
     });
@@ -192,7 +198,7 @@ describe("background/commandHandler", () => {
         payload: mockContext
       };
 
-      const messagePromise = messageListener(message, {} as browser.Runtime.MessageSender);
+      const messagePromise = messageListener(message, {});
 
       jest.advanceTimersByTime(300);
       await messagePromise;
@@ -250,6 +256,40 @@ describe("background/commandHandler", () => {
       );
     });
 
+    test("it should return a paginated slice of task history when the activity tab requests a page", async () => {
+      const { getTasksPage } = require("@/dao/NaranjoTaskDAO");
+      const fakePage = { tasks: [{ id: "t1" }], total: 42 };
+      (getTasksPage as jest.Mock).mockResolvedValue(fakePage);
+
+      const message: APIMessages = {
+        action: NaranjoAction.getTaskHistoryPage,
+        payload: { offset: 25, limit: 25 },
+      };
+
+      const result = await messageListener(message, {});
+
+      expect(getTasksPage).toHaveBeenCalledWith(25, 25);
+      expect(result).toEqual(fakePage);
+    });
+
+    test("it should fall back to an empty page when paginated history loading fails", async () => {
+      const { getTasksPage } = require("@/dao/NaranjoTaskDAO");
+      (getTasksPage as jest.Mock).mockRejectedValue(new Error("DB error"));
+
+      const message: APIMessages = {
+        action: NaranjoAction.getTaskHistoryPage,
+        payload: { offset: 0, limit: 25 },
+      };
+
+      const result = await messageListener(message, { tab: { id: 7 } } as browser.Runtime.MessageSender);
+
+      expect(result).toEqual({ tasks: [], total: 0 });
+      expect(sendErrorMessage).toHaveBeenCalledWith(
+        expect.stringContaining("task history page"),
+        7,
+      );
+    });
+
     test("it should coordinate the execution of the user's default action using the current page selection", async () => {
       const mockContext: NaranjoContext = { id: "def", title: "Default", action: NaranjoAction.replaceText, prompt: "p" };
       (getDefaultContextId as jest.Mock).mockResolvedValue("def");
@@ -271,6 +311,22 @@ describe("background/commandHandler", () => {
         undefined
       );
     });
+
+    test("it should notify the user when executeDefaultContext is triggered but no default ID is found", async () => {
+      (getDefaultContextId as jest.Mock).mockResolvedValue(null);
+
+      const message: APIMessages = {
+        action: NaranjoAction.executeDefaultContext,
+        payload: { selectionText: "Selected Text" }
+      };
+
+      await messageListener(message, { tab: { id: 456 } } as browser.Runtime.MessageSender);
+
+      expect(sendErrorMessage).toHaveBeenCalledWith(
+        expect.stringContaining("No default context set"),
+        456
+      );
+    });
   });
 
   describe("System Commands", () => {
@@ -279,7 +335,7 @@ describe("background/commandHandler", () => {
       (getNaranjoContexts as jest.Mock).mockResolvedValue([{ id: "1" }]);
       (getDefaultContextId as jest.Mock).mockResolvedValue("1");
 
-      await commandListener("open-quick-menu");
+      await handleCommand("open-quick-menu");
 
       expect(browser.tabs.sendMessage).toHaveBeenCalledWith(789, {
         action: NaranjoAction.openQuickMenu,
@@ -294,7 +350,7 @@ describe("background/commandHandler", () => {
       (browser.tabs.query as jest.Mock).mockResolvedValue([{ id: 789, url: "https://google.com" }]);
       (getDefaultContextId as jest.Mock).mockResolvedValue("1");
 
-      await commandListener("run-default-context");
+      await handleCommand("run-default-context");
 
       expect(browser.tabs.sendMessage).toHaveBeenCalledWith(789, {
         action: NaranjoAction.requestSelectionFromPage
@@ -305,7 +361,7 @@ describe("background/commandHandler", () => {
       (browser.tabs.query as jest.Mock).mockResolvedValue([{ id: 789, url: "https://google.com" }]);
       (getDefaultContextId as jest.Mock).mockResolvedValue(null);
 
-      await commandListener("run-default-context");
+      await handleCommand("run-default-context");
 
       expect(sendErrorMessage).toHaveBeenCalledWith(
         expect.stringContaining("No default context set"),
@@ -315,8 +371,8 @@ describe("background/commandHandler", () => {
 
     test("it should not attempt to execute actions on restricted browser pages", async () => {
       (browser.tabs.query as jest.Mock).mockResolvedValue([{ id: 999, url: "chrome://settings" }]);
-      
-      await commandListener("open-quick-menu");
+
+      await handleCommand("open-quick-menu");
 
       // Should not call getNaranjoContexts or try to send a message
       expect(getNaranjoContexts).not.toHaveBeenCalled();

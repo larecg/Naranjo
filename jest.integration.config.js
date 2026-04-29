@@ -18,5 +18,6 @@ export default {
     ],
   },
   extensionsToTreatAsEsm: [".ts"],
-  testPathIgnorePatterns: ["/node_modules/", "/dist/", "/integration/"],
+  testMatch: ["<rootDir>/integration/**/*.integration.test.ts"],
+  testPathIgnorePatterns: ["/node_modules/", "/dist/"],
 };

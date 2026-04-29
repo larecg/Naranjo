@@ -140,6 +140,12 @@
   "badge_default": {
     "message": "Pred."
   },
+  "tooltip_set_default": {
+    "message": "Establecer como acción predeterminada"
+  },
+  "tooltip_is_default": {
+    "message": "Acción predeterminada actual"
+  },
   "set_as_default": {
     "message": "\"$CONTEXT_NAME$\" establecido como predeterminado",
     "placeholders": {
@@ -234,6 +240,12 @@
   "options_providers_heading": {
     "message": "Proveedores"
   },
+  "options_changelog_sidebar": {
+    "message": "Registro de cambios"
+  },
+  "options_changelog_title": {
+    "message": "Registro de cambios"
+  },
   "options_configuration_heading": {
     "message": "Configuración"
   },
@@ -270,11 +282,23 @@
   "label_model_status": {
     "message": "Estado del modelo"
   },
-  "ollama_cloud_api_key_label": {
+  "ollama_mode_label": {
+    "message": "Modo"
+  },
+  "ollama_mode_local": {
+    "message": "Local"
+  },
+  "ollama_mode_cloud": {
+    "message": "Cloud"
+  },
+  "ollama_cloud_api_key_label_optional": {
     "message": "Clave API de Ollama Cloud (opcional)"
   },
-  "ollama_cloud_api_key_hint": {
-    "message": "Déjalo vacío para usar Ollama local en localhost:11434."
+  "ollama_cloud_api_key_label_required": {
+    "message": "Clave API de Ollama Cloud (obligatoria)"
+  },
+  "msg_ollama_cloud_key_required": {
+    "message": "Se requiere una clave API para el modo Ollama Cloud."
   },
   "ollama_origins_hint": {
     "message": "Para permitir que la extensión se comunique con Ollama, establece: export OLLAMA_ORIGINS=\"moz-extension://*,chrome-extension://*\""
@@ -348,6 +372,9 @@
   "btn_view_answer": {
     "message": "Ver respuesta"
   },
+  "btn_copy_response": {
+    "message": "Copiar respuesta"
+  },
   "model_global_default": {
     "message": "— Predeterminado global —"
   },
@@ -392,5 +419,22 @@
   },
   "btn_apply_replace": {
     "message": "Aplicar"
+  },
+  "pagination_prev": {
+    "message": "Página anterior"
+  },
+  "pagination_next": {
+    "message": "Página siguiente"
+  },
+  "pagination_page_info": {
+    "message": "Página $CURRENT$ de $TOTAL$",
+    "placeholders": {
+      "current": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
   }
 }

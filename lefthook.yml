@@ -1,0 +1,9 @@
+pre-push:
+  parallel: true
+  commands:
+    lint:
+      run: npm run lint:ci
+    build:
+      run: npm run build
+    test:
+      run: npm test

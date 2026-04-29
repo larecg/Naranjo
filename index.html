@@ -537,7 +537,13 @@
       justify-content: center;
       align-items: center;
       gap: 6px;
-      flex: 0 0 80px;
+      flex: 0 0 110px;
+    }
+
+    .set-default-context-button.default-active {
+      color: var(--color-amber) !important;
+      border-color: var(--color-amber) !important;
+      background-color: var(--color-sand) !important;
     }
 
     .model-override-popup {
@@ -580,11 +586,13 @@
       color: var(--color-amber) !important;
     }
 
-    .model-override-btn[data-tooltip] {
+    .model-override-btn[data-tooltip],
+    .set-default-context-button[data-tooltip] {
       position: relative;
     }
 
-    .model-override-btn[data-tooltip]:hover::after {
+    .model-override-btn[data-tooltip]:hover::after,
+    .set-default-context-button[data-tooltip]:hover::after {
       content: attr(data-tooltip);
       position: absolute;
       bottom: calc(100% + 6px);
@@ -606,7 +614,8 @@
       z-index: 0;
     }
 
-    .context-table-row-content:has(.model-override-btn:hover) {
+    .context-table-row-content:has(.model-override-btn:hover),
+    .context-table-row-content:has(.set-default-context-button:hover) {
       z-index: 10;
     }
 
@@ -947,6 +956,26 @@
     }
     .col-status { flex: 1; min-width: 80px; }
     .col-actions { flex: 1.2; gap: 6px; min-width: 80px; }
+
+    .history-pagination {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .history-pagination .table-th-button-action[disabled] {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .history-page-info {
+      font-size: 13px;
+      color: var(--color-slate);
+      min-width: 110px;
+      text-align: center;
+    }
     /* Reserves eye-button space in FAILED rows so flex distribution is identical across all rows */
     .col-actions-placeholder { width: 32px; height: 32px; display: inline-block; flex-shrink: 0; }
 
@@ -974,7 +1003,13 @@
       font-size: 15px;
       color: var(--color-moss);
     }
-    #close-answer-modal {
+    .answer-modal-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    #close-answer-modal,
+    #copy-answer-modal {
       background: none;
       border: none;
       cursor: pointer;
@@ -983,8 +1018,12 @@
       padding: 2px 6px;
       border-radius: 6px;
     }
-    #close-answer-modal:hover {
+    #close-answer-modal:hover,
+    #copy-answer-modal:hover {
       background: var(--color-sand);
+    }
+    #copy-answer-modal.hidden {
+      display: none;
     }
     .answer-modal-content {
       margin: 0;
@@ -1177,6 +1216,16 @@
           <!-- Tasks will be rendered here -->
         </tbody>
       </table>
+
+      <div id="history-pagination" class="history-pagination hidden">
+        <button id="history-prev-page" class="table-th-button-action" data-i18n-title="pagination_prev" title="Previous page">
+          <i class="fa fa-chevron-left"></i>
+        </button>
+        <span id="history-page-info" class="history-page-info"></span>
+        <button id="history-next-page" class="table-th-button-action" data-i18n-title="pagination_next" title="Next page">
+          <i class="fa fa-chevron-right"></i>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -1260,7 +1309,10 @@
   <dialog id="answer-modal">
     <div class="answer-modal-header">
       <span data-i18n="modal_answer_title">LLM Answer</span>
-      <button id="close-answer-modal"><i class="fa fa-times"></i></button>
+      <div class="answer-modal-actions">
+        <button id="copy-answer-modal" data-i18n-title="btn_copy_response" title="Copy response"><i class="fa fa-copy"></i></button>
+        <button id="close-answer-modal"><i class="fa fa-times"></i></button>
+      </div>
     </div>
     <div id="answer-modal-content" class="answer-modal-content"></div>
   </dialog>

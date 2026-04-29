@@ -354,6 +354,24 @@
 }
 .naranjo-report-btn:hover { opacity: 1; }
 .naranjo-report-btn svg { width: 14px; height: 14px; }
+.naranjo-copy-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-slate);
+  padding: 2px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+.naranjo-copy-btn:hover { opacity: 1; }
+.naranjo-copy-btn svg { width: 14px; height: 14px; }
 
 .naranjo-custom-prompt-item {
   border-top: 1px solid var(--border-subtle);

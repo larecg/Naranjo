@@ -5,11 +5,11 @@
 
 ## Overview
 
-Naranjo is a browser extension that lets you process selected text on any webpage using AI-powered context menu actions. It supports multiple LLM providers — local (Ollama, Chrome Built-in) or cloud (OpenAI, Google, Anthropic, Mistral, xAI, DeepSeek) — with fully customizable prompt contexts.
+Naranjo is a browser extension that lets you process selected text on any webpage using AI-powered context menu actions. It supports multiple LLM providers — Ollama (local & cloud), OpenAI, Google, Anthropic, Mistral, xAI, and DeepSeek — with fully customizable prompt contexts.
 
 ## Features
 
-- **Multi-provider LLM support**: Ollama, OpenAI, Google Gemini, Anthropic Claude, Mistral, xAI Grok, DeepSeek, Chrome Built-in AI
+- **Multi-provider LLM support**: Ollama, OpenAI, Google Gemini, Anthropic Claude, Mistral, xAI Grok, DeepSeek
 - **Context menu actions** on any selected text
 - **Quick menu** (`Alt+Shift+Q`): floating overlay for fast context selection
 - **Custom one-time prompts** entered directly from the quick menu
@@ -66,8 +66,7 @@ At least one LLM provider must be enabled in the Options page after loading the 
 
 | Provider | Type | Requirements |
 |---|---|---|
-| Ollama | Local | Install & run `ollama serve` (see below) |
-| Chrome Built-in AI | Local | Enable in Chrome flags |
+| Ollama | Local & Cloud | Install & run `ollama serve`, or configure a cloud API key (see below) |
 | OpenAI | Cloud | API key |
 | Google Gemini | Cloud | API key |
 | Anthropic Claude | Cloud | API key |

@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { NaranjoContext, NaranjoAction } from "@/entities/types";
+import { type NaranjoContext, NaranjoAction } from "@/entities/types";
 import { injectStyles, QUICK_MENU_ID } from "./injectStyles";
 import { showToast } from "./toastOverlay";
 import { t } from "@/app/i18n";
@@ -49,7 +49,7 @@ export function removeQuickMenu(): void {
  */
 function executeAction(contextId: string, selectionText: string) {
   removeQuickMenu();
-  sendMessage({
+  void sendMessage({
     action: NaranjoAction.executeContext,
     payload: { contextId, selectionText },
   });
@@ -102,7 +102,7 @@ function executeCustomPrompt(
   if (promptAction === NaranjoAction.replaceText) {
     restoreSelection?.();
   }
-  sendMessage({
+  void sendMessage({
     action: NaranjoAction.executeCustomPrompt,
     payload: { customPrompt, selectionText, action: promptAction },
   });
@@ -319,7 +319,7 @@ export function showQuickMenu(contexts: NaranjoContext[], defaultContextId: stri
     } else if (event.key === "Enter") {
       if (selectedIndex < contexts.length) {
         if (event.altKey) {
-          sendMessage({
+          void sendMessage({
             action: "setDefaultContext",
             payload: contexts[selectedIndex].id
           });

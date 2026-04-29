@@ -15,7 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { getAllProviderConfigs, getProviderConfig, saveProviderConfig } from "./ProviderConfigDAO";
-import { OllamaProviderConfig } from "@/entities/types";
+import { type OllamaProviderConfig } from "@/entities/types";
 import browser from "webextension-polyfill";
 
 describe("ProviderConfigDAO", () => {

@@ -41,7 +41,7 @@ export async function consumeOpenAICompatibleSSE(
       const data = line.slice(6).trim();
       if (data === "[DONE]") return fullContent;
       try {
-        const parsed = JSON.parse(data);
+        const parsed = JSON.parse(data) as { choices?: [{ delta?: { content?: string } }] };
         const chunk = parsed.choices?.[0]?.delta?.content;
         if (chunk) {
           fullContent += chunk;

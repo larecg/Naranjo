@@ -25,11 +25,11 @@ import { sendPrompt as sendXAIPrompt } from "@/services/xaiService";
 import { sendPrompt as sendDeepSeekPrompt } from "@/services/deepseekService";
 import {
   NaranjoAction,
-  NaranjoTask,
+  type NaranjoTask,
   TaskStatus,
-  AlertResponseAPIMessage,
-  ErrorReportContext,
-  ConversationTurn,
+  type AlertResponseAPIMessage,
+  type ErrorReportContext,
+  type ConversationTurn,
 } from "@/entities/types";
 import { addTask, updateTask, getPendingTasks, getTaskById, deleteTask } from "@/dao/NaranjoTaskDAO";
 import { getSelectedModel, loadState } from "./state";
@@ -48,11 +48,14 @@ let isProcessing = false;
  */
 const pendingNotifications = new Map<string, ReturnType<typeof setTimeout>>();
 
-async function safeSendMessage(tabId: number, message: any) {
+async function safeSendMessage(tabId: number, message: unknown) {
   try {
     await browser.tabs.sendMessage(tabId, message);
   } catch (error) {
-    console.warn(`Could not send message to tab ${tabId}`, error);
+    const msg = error instanceof Error ? error.message : String(error);
+    if (!msg.includes("Receiving end does not exist")) {
+      console.warn(`Could not send message to tab ${tabId}`, error);
+    }
   }
 }
 
@@ -128,23 +131,25 @@ export async function enqueueTask(
   await addTask(task);
 
   // Set a timer to show the processing notification only if it takes more than 500ms
-  const timeoutId = setTimeout(async () => {
-    if (tabId) {
-      await safeSendMessage(tabId, {
-        action: NaranjoAction.alertUser,
-        type: "PROCESSING",
-        payload: {
-          content: t("processing_request", contextTitle),
-          taskId: task.id,
-        },
-      });
-    }
-    pendingNotifications.delete(task.id);
+  const timeoutId = setTimeout(() => {
+    void (async () => {
+      if (tabId) {
+        await safeSendMessage(tabId, {
+          action: NaranjoAction.alertUser,
+          type: "PROCESSING",
+          payload: {
+            content: t("processing_request", contextTitle),
+            taskId: task.id,
+          },
+        });
+      }
+      pendingNotifications.delete(task.id);
+    })();
   }, 500);
 
   pendingNotifications.set(task.id, timeoutId);
 
-  processQueue();
+  void processQueue();
 }
 
 /**
@@ -170,15 +175,13 @@ export async function processQueue(): Promise<void> {
       await updateTask({ ...task });
 
       // Port for streaming chunks to the originating tab
-      let port: any = null;
+      let port: browser.Runtime.Port | null = null;
       let accumulated = "";
       let firstChunkReceived = false;
 
       try {
         await loadState();
         const selectedModelId = task.modelId ?? await getSelectedModel();
-
-        console.debug("Processing task", { taskId: task.id, selectedModelId });
 
         if (!selectedModelId) {
           throw new Error("No model selected in extension settings");
@@ -193,8 +196,8 @@ export async function processQueue(): Promise<void> {
             port.onDisconnect.addListener(() => {
               if (browser.runtime.lastError) {
                 console.warn("Streaming port disconnected", browser.runtime.lastError.message);
-                port = null;
               }
+              port = null;
             });
             port.postMessage({ event: "start", taskId: task.id, action: task.action, targetTaskId: task.parentTaskId });
           } catch (e) {
@@ -204,7 +207,8 @@ export async function processQueue(): Promise<void> {
         }
 
         // onChunk is only wired up when a port is available
-        const onChunk = port
+        const activePort = port;
+        const onChunk = activePort
           ? (chunk: string) => {
               if (!firstChunkReceived) {
                 firstChunkReceived = true;
@@ -216,10 +220,12 @@ export async function processQueue(): Promise<void> {
                 }
               }
               accumulated += chunk;
-              try {
-                port.postMessage({ event: "chunk", accumulated });
-              } catch (e) {
-                console.warn("Could not stream chunk to port", e);
+              if (port !== null) {
+                try {
+                  activePort.postMessage({ event: "chunk", accumulated });
+                } catch (e) {
+                  console.warn("Could not stream chunk to port", e);
+                }
               }
             }
           : undefined;
@@ -235,8 +241,6 @@ export async function processQueue(): Promise<void> {
         const [providerId, ...modelParts] = parts;
         const modelId = modelParts.join(":");
         let response: string | null = null;
-
-        console.debug("Routing to provider", { providerId, modelId });
 
         const sharedParams = {
           model: modelId,
@@ -265,8 +269,6 @@ export async function processQueue(): Promise<void> {
         } else {
           throw new Error(`Unsupported provider: ${providerId}`);
         }
-
-        console.debug("Response received from provider", { taskId: task.id, success: !!response });
 
         await updateTask({
           ...task,
@@ -311,8 +313,8 @@ export async function processQueue(): Promise<void> {
           });
         }
       } catch (error) {
-        console.error("Error processing task", { task, error });
         const errorMessage = `Execution error: ${error instanceof Error ? error.message : "Unknown error"}`;
+        console.error(`Error processing task ${task.id}: ${errorMessage}`);
 
         task.status = TaskStatus.FAILED;
         task.errorMessage = errorMessage;
@@ -375,6 +377,6 @@ export async function processQueue(): Promise<void> {
   // Check for new tasks added during processing
   const remaining = await getPendingTasks();
   if (remaining.length > 0) {
-    processQueue();
+    void processQueue();
   }
 }

@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ErrorReportContext } from "@/entities/types";
+import { type ErrorReportContext } from "@/entities/types";
 
 /**
  * Builds the pre-filled body for a GitHub bug report issue from an error context.

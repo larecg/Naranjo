@@ -36,7 +36,7 @@ export function renderMarkdown(raw: string): string {
   // 2. Fenced code blocks (``` or ~~~) — processed before line splitting
   text = text.replace(
     /```(?:\w+)?\n?([\s\S]*?)```|~~~(?:\w+)?\n?([\s\S]*?)~~~/g,
-    (_, c1, c2) => `<pre><code>${(c1 ?? c2).replace(/\n$/, "")}</code></pre>`,
+    (_, c1: string | undefined, c2: string | undefined) => `<pre><code>${(c1 ?? c2 ?? "").replace(/\n$/, "")}</code></pre>`,
   );
 
   // 3. Line-by-line block processing

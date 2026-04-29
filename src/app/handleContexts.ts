@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { LLMModel, NaranjoAction, NaranjoContext } from "@/entities/types";
+import { type LLMModel, NaranjoAction, type NaranjoContext } from "@/entities/types";
 import { t } from "./i18n";
 import { sendMessage } from "@/utils/messaging";
 
@@ -35,14 +35,25 @@ let activeModelPopup: HTMLElement | null = null;
 let clickOutsideHandler: ((e: MouseEvent) => void) | null = null;
 let isAddMode = false;
 let activePromptContextId: string | undefined = undefined;
+let currentDefaultContextId: string | null = null;
 
 /**
  * Get all the stored Ollama Contexts
  * @returns Promise<NaranjoContext[]>
  */
 function getNaranjoContexts(): Promise<NaranjoContext[]> {
-  return sendMessage({
+  return sendMessage<NaranjoContext[]>({
     action: "getNaranjoContexts",
+  });
+}
+
+/**
+ * Get the current default context ID from background
+ * @returns Promise<string | null>
+ */
+async function getDefaultContextId(): Promise<string | null> {
+  return sendMessage<string | null>({
+    action: "getDefaultContextId",
   });
 }
 
@@ -153,10 +164,8 @@ function openModelPopup(
   }, { passive: false });
 
   popup.addEventListener("click", (e) => {
-    const target = (e.target as HTMLElement).closest(
-      ".model-override-popup-item",
-    ) as HTMLElement | null;
-    if (!target) return;
+    const target = (e.target as HTMLElement).closest(".model-override-popup-item");
+    if (!(target instanceof HTMLElement)) return;
     const value = target.dataset.value || undefined;
     onSelect(value);
     closeModelPopup();
@@ -251,7 +260,7 @@ function openContextEditorModal(contextId: string) {
   const titleInput = document.getElementById("prompt-editor-title") as HTMLInputElement | null;
   const modalActionSelect = document.getElementById("prompt-editor-action") as HTMLSelectElement | null;
   const textarea = document.getElementById("prompt-editor-textarea") as HTMLTextAreaElement | null;
-  const contextFields = document.getElementById("prompt-editor-context-fields") as HTMLElement | null;
+  const contextFields = document.getElementById("prompt-editor-context-fields");
   if (!modal || !textarea) return;
 
   const titleCell = document.getElementById(`title-${contextId}`);
@@ -267,7 +276,7 @@ function openContextEditorModal(contextId: string) {
       const option = document.createElement("option");
       option.value = value;
       option.textContent = displayText;
-      option.selected = value === context?.action;
+      option.selected = (value as NaranjoAction) === context?.action;
       modalActionSelect.appendChild(option);
     });
   }
@@ -289,7 +298,7 @@ function openAddContextModal() {
   const titleInput = document.getElementById("prompt-editor-title") as HTMLInputElement | null;
   const modalActionSelect = document.getElementById("prompt-editor-action") as HTMLSelectElement | null;
   const textarea = document.getElementById("prompt-editor-textarea") as HTMLTextAreaElement | null;
-  const contextFields = document.getElementById("prompt-editor-context-fields") as HTMLElement | null;
+  const contextFields = document.getElementById("prompt-editor-context-fields");
   if (!modal || !textarea) return;
 
   if (titleInput) titleInput.value = "";
@@ -331,7 +340,7 @@ async function saveContextById(contextId: string) {
   try {
     await sendMessage({
       action: "updateNaranjoContext",
-      payload: { id: contextId, title, prompt, action: action as NaranjoAction, modelId },
+      payload: { id: contextId, title, prompt, action: action, modelId },
     });
     showNotification(t("msg_changes_saved"), "success");
   } catch {
@@ -378,14 +387,29 @@ function createNaranjoContextRow(payload: NaranjoContext) {
   actionCell.addEventListener("click", () => openContextEditorModal(id));
   row.appendChild(actionCell);
 
-  // Action section (model override | delete | undo)
+  // Action section (default | model override | delete)
   const actionSection = document.createElement("td");
   actionSection.className = "context-table-action-section";
+
+  // Default context star button
+  const defaultBtn = document.createElement("button");
+  defaultBtn.className = "table-td-button-action set-default-context-button";
+  const isDefault = id === currentDefaultContextId;
+  if (isDefault) {
+    defaultBtn.classList.add("default-active");
+  }
+  defaultBtn.id = `set-default-${id}`;
+  defaultBtn.dataset.tooltip = t(isDefault ? "tooltip_is_default" : "tooltip_set_default");
+
+  const starIcon = document.createElement("i");
+  starIcon.className = isDefault ? "fa fa-star" : "fa fa-star-o";
+  defaultBtn.appendChild(starIcon);
+  actionSection.appendChild(defaultBtn);
 
   // Model override button
   const modelWrapper = document.createElement("div");
   modelWrapper.id = `model-${id}`;
-  setupModelControl(modelWrapper, id, modelId, () => saveContextById(id));
+  setupModelControl(modelWrapper, id, modelId, () => { void saveContextById(id); });
   actionSection.appendChild(modelWrapper);
 
   // Delete button
@@ -408,6 +432,7 @@ function createNaranjoContextRow(payload: NaranjoContext) {
  */
 async function displayNaranjoContexts() {
   naranjoContexts = await getNaranjoContexts();
+  currentDefaultContextId = await getDefaultContextId();
 
   const naranjoContextTable = document.getElementById(
     "naranjo-contexts-table-body",
@@ -435,10 +460,24 @@ function setupEventHandlersForNaranjoContextRow(
   row: HTMLTableRowElement,
   payload: NaranjoContext,
 ) {
-  const { id } = payload;
+  const { id, title } = payload;
 
-  addClickEventListenerToButton(`delete-context-${id}`, async function () {
-    return sendMessage({
+  addClickEventListenerToButton(`set-default-${id}`, () => {
+    void sendMessage({
+      action: "setDefaultContext",
+      payload: id,
+    })
+      .then(() => {
+        showNotification(t("set_as_default", title), "success");
+        return displayNaranjoContexts();
+      })
+      .catch(() => {
+        showNotification(t("msg_changes_save_error"), "error");
+      });
+  });
+
+  addClickEventListenerToButton(`delete-context-${id}`, () => {
+    void sendMessage({
         action: "deleteNaranjoContext",
         payload: id,
       })
@@ -463,9 +502,9 @@ function setupEventHandlersForNaranjoContextRow(
   });
 }
 
-window.addEventListener("load", async () => {
+async function onWindowLoad() {
   // Load available models for model override selectors
-  availableModels = await sendMessage({ action: "getLocalLLModels" }) ?? [];
+  availableModels = await sendMessage<LLMModel[]>({ action: "getLocalLLModels" }) ?? [];
 
   // FIXME: revisit if it's necessary to extract this logic to a separate function
   await displayNaranjoContexts();
@@ -494,7 +533,7 @@ window.addEventListener("load", async () => {
     promptEditorModal?.close();
   });
 
-  document.getElementById("save-prompt-editor-modal")?.addEventListener("click", async () => {
+  async function handleSavePromptModal() {
     if (!promptEditorTextarea) return;
 
     const titleInput = document.getElementById("prompt-editor-title") as HTMLInputElement | null;
@@ -549,10 +588,18 @@ window.addEventListener("load", async () => {
         showNotification(t("msg_changes_save_error"), "error");
       }
     }
+  }
+
+  document.getElementById("save-prompt-editor-modal")?.addEventListener("click", () => {
+    void handleSavePromptModal();
   });
 
   promptEditorModal?.addEventListener("close", () => {
     activePromptContextId = undefined;
     isAddMode = false;
   });
+}
+
+window.addEventListener("load", () => {
+  void onWindowLoad();
 });

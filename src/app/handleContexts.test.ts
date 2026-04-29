@@ -16,7 +16,7 @@
 
 jest.mock("@/utils/messaging");
 
-import { NaranjoAction, NaranjoContext } from "@/entities/types";
+import { NaranjoAction, type NaranjoContext } from "@/entities/types";
 import { sendMessage } from "@/utils/messaging";
 import "@/app/handleContexts";
 

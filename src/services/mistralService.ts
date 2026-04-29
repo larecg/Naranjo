@@ -15,7 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { getProviderConfig } from "@/dao/ProviderConfigDAO";
-import { MistralProviderConfig, ConversationTurn } from "@/entities/types";
+import { type MistralProviderConfig, type ConversationTurn } from "@/entities/types";
 import { consumeOpenAICompatibleSSE } from "@/utils/streaming";
 
 /**
@@ -59,14 +59,14 @@ export async function getListOfModels(): Promise<string[]> {
       throw new Error(response.statusText);
     }
 
-    const result = await response.json();
+    const result = await response.json() as { data?: { capabilities?: { completion_chat?: boolean }; id: string }[] };
     if (!result.data || !Array.isArray(result.data)) {
       throw new Error("Invalid response format");
     }
 
     const models = result.data
-      .filter((model: any) => model.capabilities?.completion_chat)
-      .map((model: any) => model.id);
+      .filter((model) => model.capabilities?.completion_chat)
+      .map((model) => model.id);
 
     return models.length > 0 ? models : ["mistral-large-latest", "mistral-small-latest", "open-mixtral-8x22b"];
   } catch (error) {
@@ -118,15 +118,15 @@ export async function sendPrompt(params: {
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
+      const errorData = await response.json().catch(() => ({})) as { error?: { message?: string } };
       throw new Error(errorData.error?.message || response.statusText);
     }
 
     if (useStream) {
-      return await consumeOpenAICompatibleSSE(response, onChunk!);
+      return await consumeOpenAICompatibleSSE(response, onChunk);
     }
 
-    const result = await response.json();
+    const result = await response.json() as { choices?: Array<{ message?: { content: string } }> };
     if (!result.choices || !result.choices[0]?.message?.content) {
       throw new Error("Invalid response format from Mistral API");
     }
